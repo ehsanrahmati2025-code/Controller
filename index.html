@@ -1,0 +1,2402 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0e1a">
+<meta name="format-detection" content="telephone=no">
+<title>⚡ کنترلر هوشمند گلخانه — TAK Industrial Group</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/mqtt@5.3.0/dist/mqtt.min.js"></script>
+
+<style>
+:root {
+  --primary: #6366f1;
+  --primary-glow: rgba(99, 102, 241, 0.5);
+  --primary-soft: rgba(99, 102, 241, 0.1);
+  --primary-medium: rgba(99, 102, 241, 0.15);
+  --primary-strong: rgba(99, 102, 241, 0.3);
+  --success: #10b981;
+  --success-glow: rgba(16, 185, 129, 0.4);
+  --success-soft: rgba(16, 185, 129, 0.1);
+  --success-medium: rgba(16, 185, 129, 0.15);
+  --danger: #ef4444;
+  --danger-glow: rgba(239, 68, 68, 0.4);
+  --danger-soft: rgba(239, 68, 68, 0.1);
+  --danger-medium: rgba(239, 68, 68, 0.15);
+  --warning: #f59e0b;
+  --warning-soft: rgba(245, 158, 11, 0.15);
+  --bg-1: #0a0e1a;
+  --bg-2: #131829;
+  --card-bg: rgba(30, 41, 59, 0.55);
+  --card-bg-solid: rgba(30, 41, 59, 0.92);
+  --card-bg-inner: rgba(15, 23, 42, 0.4);
+  --card-border: rgba(148, 163, 184, 0.15);
+  --card-border-strong: rgba(148, 163, 184, 0.25);
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --input-bg: rgba(15, 23, 42, 0.7);
+  --font: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif;
+  --font-en: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+}
+
+[data-theme="light"] {
+  --bg-1: #eef2ff;
+  --bg-2: #f8fafc;
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --card-bg-solid: rgba(255, 255, 255, 0.98);
+  --card-bg-inner: rgba(241, 245, 249, 0.8);
+  --card-border: rgba(99, 102, 241, 0.18);
+  --card-border-strong: rgba(99, 102, 241, 0.3);
+  --text: #0f172a;
+  --text-muted: #475569;
+  --shadow: 0 8px 32px rgba(99, 102, 241, 0.12);
+  --shadow-lg: 0 20px 60px rgba(99, 102, 241, 0.18);
+  --input-bg: rgba(255, 255, 255, 0.95);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  font-family: var(--font);
+}
+
+input, textarea, select, [contenteditable="true"] {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+
+html {
+  width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-1) 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  color: var(--text);
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 14px;
+  padding-top: max(14px, env(safe-area-inset-top));
+  padding-bottom: max(14px, env(safe-area-inset-bottom));
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body.modal-open {
+  overflow: hidden !important;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, var(--primary-medium), transparent 50%),
+    radial-gradient(circle at 80% 70%, var(--success-soft), transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 1500px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.num, .clock .time, .stat-info h3, .schedule-time, .relay-time, .log-time {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   📛 نوار بالای صفحه — لوگوی TAK
+   ============================================================ */
+.top-brand-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  padding: 10px 16px;
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: all 0.3s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.top-brand-bar:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px var(--primary-glow);
+}
+
+.top-brand-bar:active {
+  transform: scale(0.98);
+}
+
+.brand-logo-svg {
+  height: 48px;
+  width: auto;
+  display: block;
+  transition: all 0.3s;
+}
+
+[data-theme="dark"] .brand-logo-svg .logo-fill-white { fill: #f1f5f9; }
+[data-theme="dark"] .brand-logo-svg .logo-fill-black { fill: #0a0e1a; }
+
+.brand-info-icon {
+  margin-right: auto;
+  margin-left: 0;
+  font-size: 14px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.7;
+  transition: all 0.3s;
+}
+
+.top-brand-bar:hover .brand-info-icon {
+  color: var(--primary);
+  opacity: 1;
+}
+
+.brand-hint {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+@media (max-width: 520px) {
+  .top-brand-bar { padding: 8px 12px; margin-bottom: 10px; }
+  .brand-logo-svg { height: 40px; }
+  .brand-hint { display: none; }
+}
+
+/* ============================================================
+   هدر
+   ============================================================ */
+header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 16px 18px;
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.logo { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+
+.logo-icon {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  box-shadow: 0 0 24px var(--primary-glow);
+  flex-shrink: 0;
+}
+
+.logo h1 {
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, var(--primary), #8b5cf6, var(--success));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo p { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-top: 3px; }
+
+.clock {
+  text-align: left;
+  padding: 12px 18px;
+  background: var(--primary-soft);
+  border-radius: 16px;
+  border: 1px solid var(--primary-strong);
+  flex-shrink: 0;
+  min-width: 130px;
+}
+
+.clock .time { font-size: 28px; font-weight: 800; color: var(--primary); line-height: 1.1; letter-spacing: 1px; }
+.clock .date { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 4px; }
+
+.header-bottom { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: var(--danger-soft);
+  border: 1px solid var(--danger-medium);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.3s;
+}
+
+.status-badge.connected { background: var(--success-soft); border-color: var(--success-medium); }
+
+.pulse-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--danger); flex-shrink: 0; }
+.status-badge.connected .pulse-dot { background: var(--success); animation: pulseGreen 2s infinite; }
+
+@keyframes pulseGreen {
+  0% { box-shadow: 0 0 0 0 var(--success-glow); }
+  70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.icon-group { display: flex; gap: 8px; flex-shrink: 0; }
+
+.icon-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 22px;
+  transition: all 0.25s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font);
+  touch-action: manipulation;
+}
+
+.icon-btn:active { background: var(--primary); transform: scale(0.92); border-color: var(--primary); }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+@media (min-width: 700px) { .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; } }
+
+.stat-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  box-shadow: var(--shadow);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.stat-icon.blue { background: var(--primary-soft); }
+.stat-icon.green { background: var(--success-soft); }
+.stat-icon.red { background: var(--danger-soft); }
+.stat-icon.yellow { background: var(--warning-soft); }
+
+.stat-info { min-width: 0; text-align: right; flex: 1; }
+.stat-info h3 { font-size: 28px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
+.stat-info p { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-top: 4px; }
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 14px;
+  padding-right: 2px;
+}
+
+.section-title::before {
+  content: '';
+  width: 5px;
+  height: 22px;
+  background: linear-gradient(180deg, var(--primary), var(--success));
+  border-radius: 4px;
+}
+
+.relay-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 900px) { .relay-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; } }
+
+.relay-card {
+  position: relative;
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 16px 12px;
+  text-align: center;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.relay-card.on {
+  border-color: var(--success);
+  box-shadow: 0 0 30px var(--success-glow), var(--shadow);
+  transform: translateY(-3px);
+}
+
+.relay-number {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--primary-medium);
+  color: var(--primary);
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  align-self: center;
+}
+
+.relay-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+  min-height: 24px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.relay-state-icon {
+  font-size: 42px;
+  margin: 6px 0;
+  filter: grayscale(1) opacity(0.5);
+  transition: all 0.4s;
+  line-height: 1;
+}
+
+.relay-card.on .relay-state-icon { filter: none; animation: bulbGlow 2s ease-in-out infinite; }
+
+@keyframes bulbGlow {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px var(--success)); }
+  50% { transform: scale(1.08); filter: drop-shadow(0 0 25px var(--success)); }
+}
+
+.relay-state-text {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--danger);
+}
+
+.relay-card.on .relay-state-text { color: var(--success); }
+.relay-time { font-size: 11px; font-weight: 500; color: var(--text-muted); margin-bottom: 12px; min-height: 16px; }
+
+.sparkline-wrap {
+  height: 44px;
+  margin: 6px 0;
+  background: var(--card-bg-inner);
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.sparkline-canvas { width: 100%; height: 100%; }
+
+.relay-actions { display: flex; gap: 8px; justify-content: center; margin-top: auto; }
+
+.btn {
+  flex: 1;
+  min-height: 46px;
+  padding: 11px 10px;
+  border: none;
+  border-radius: 11px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #fff;
+  transition: all 0.25s;
+  touch-action: manipulation;
+}
+
+.btn:active { transform: scale(0.95); }
+.btn-on { background: linear-gradient(135deg, #10b981, #059669); }
+.btn-off { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 900px) { .bottom-grid { grid-template-columns: 2fr 1fr; } }
+
+.panel {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  box-shadow: var(--shadow);
+  min-width: 0;
+}
+
+.chart-wrapper { position: relative; height: 220px; width: 100%; }
+
+.log-container {
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.log-container::-webkit-scrollbar { width: 5px; }
+.log-container::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+.log-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: var(--primary-soft);
+  border-right: 3px solid var(--primary);
+  border-radius: 10px;
+  font-size: 13px;
+  animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.log-entry.on { border-right-color: var(--success); }
+.log-entry.off { border-right-color: var(--danger); }
+.log-icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+
+.log-content { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.log-row-1 { display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: wrap; }
+.log-row-2 { display: flex; justify-content: flex-end; font-size: 11px; color: var(--text-muted); }
+.log-relay { font-weight: 700; color: var(--primary); font-size: 13px; }
+.log-state { font-weight: 700; font-size: 13px; }
+.log-time { font-size: 11px; color: var(--text-muted); }
+
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  left: 16px;
+  right: 16px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  align-items: center;
+}
+
+.toast {
+  padding: 12px 18px;
+  background: var(--card-bg-solid);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  pointer-events: auto;
+  max-width: 100%;
+  animation: toastIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toast.success { border-right: 4px solid var(--success); }
+.toast.error { border-right: 4px solid var(--danger); }
+.toast.info { border-right: 4px solid var(--primary); }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(60px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.toast.hide { animation: toastOut 0.4s forwards; }
+@keyframes toastOut { to { opacity: 0; transform: translateY(60px); } }
+
+/* ============================================================
+   Modal
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  overflow-y: auto;
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--card-bg-solid);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  padding: 22px;
+  max-width: 640px;
+  width: 100%;
+  max-height: calc(100vh - 28px);
+  max-height: calc(100dvh - 28px);
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: modalIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  margin: auto;
+}
+
+.modal.wide { max-width: 900px; }
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(30px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.close-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: var(--danger-medium);
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.25s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font);
+  flex-shrink: 0;
+}
+
+.close-btn:active { background: var(--danger); color: #fff; transform: scale(0.9); }
+
+/* ============================================================
+   About Modal (شرکت)
+   ============================================================ */
+.about-modal {
+  text-align: center;
+}
+
+.about-logo {
+  height: 70px;
+  width: auto;
+  display: block;
+  margin: 0 auto 20px;
+}
+
+[data-theme="dark"] .about-logo .logo-fill-white { fill: #f1f5f9; }
+[data-theme="dark"] .about-logo .logo-fill-black { fill: #0a0e1a; }
+
+.about-company-name {
+  font-size: 22px;
+  font-weight: 900;
+  background: linear-gradient(90deg, var(--primary), #8b5cf6, var(--success));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+
+.about-company-tagline {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 22px;
+  letter-spacing: 0.5px;
+  font-family: var(--font-en);
+}
+
+.about-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--card-border-strong), transparent);
+  margin: 18px 0;
+}
+
+.about-section-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.about-text {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 2;
+  color: var(--text);
+  text-align: right;
+  padding: 0 4px;
+}
+
+.about-services {
+  text-align: right;
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.about-service-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  padding: 8px 12px;
+  background: var(--card-bg-inner);
+  border-radius: 10px;
+  border-right: 3px solid var(--primary);
+}
+
+.about-service-item .emoji {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.about-contact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  text-align: right;
+}
+
+@media (min-width: 500px) {
+  .about-contact-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.about-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--card-bg-inner);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  transition: all 0.25s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.about-contact-item:hover {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.about-contact-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--primary-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.about-contact-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.about-contact-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.about-contact-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  word-break: break-all;
+  direction: ltr;
+  text-align: right;
+}
+
+.about-contact-value.fa {
+  direction: rtl;
+  font-family: var(--font);
+}
+
+.about-ceo-box {
+  padding: 16px;
+  background: linear-gradient(135deg, var(--primary-soft), var(--success-soft));
+  border: 1px solid var(--primary-strong);
+  border-radius: 14px;
+  margin-bottom: 4px;
+}
+
+.about-ceo-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.about-ceo-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.about-footer {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--card-border);
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+.about-version-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--primary-soft);
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-top: 8px;
+}
+
+/* ============================================================
+   تب‌ها
+   ============================================================ */
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 18px;
+  background: var(--card-bg-inner);
+  padding: 5px;
+  border-radius: var(--radius);
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  flex: 1;
+  min-width: 80px;
+  padding: 11px 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.25s;
+  touch-action: manipulation;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.3s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.form-group { margin-bottom: 16px; }
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 13px 16px;
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.25s;
+}
+
+.form-group input.ltr { direction: ltr; text-align: left; }
+.form-group input:focus, .form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+.form-hint { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-top: 6px; line-height: 1.7; }
+
+.sheets-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.sheets-actions button {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  min-height: 50px;
+  touch-action: manipulation;
+  transition: all 0.25s;
+}
+
+.download-btn {
+  background: linear-gradient(135deg, var(--success), #059669);
+  color: #fff;
+  box-shadow: 0 4px 12px var(--success-glow);
+}
+
+.open-sheet-btn {
+  background: var(--card-border-strong);
+  color: var(--text);
+  border: 1px solid var(--card-border) !important;
+}
+
+.names-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media (min-width: 600px) { .names-grid { grid-template-columns: 1fr 1fr; } }
+
+.name-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--card-bg-inner);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  transition: all 0.25s;
+}
+
+.name-item:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+
+.name-item-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--primary-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  flex-shrink: 0;
+}
+
+.name-item input {
+  flex: 1;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 600;
+  border-bottom: 2px solid transparent;
+  min-width: 0;
+}
+
+.name-item input:focus { border-bottom-color: var(--primary); }
+
+.name-item-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 26px;
+  text-align: center;
+}
+
+.schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+
+.schedule-count {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding: 7px 14px;
+  background: var(--primary-soft);
+  border-radius: var(--radius-sm);
+}
+
+.add-schedule-btn {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--success), #059669);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px var(--success-glow);
+  min-height: 46px;
+}
+
+.schedule-list { display: flex; flex-direction: column; gap: 10px; max-height: 55vh; overflow-y: auto; }
+
+.schedule-item {
+  background: var(--card-bg-inner);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 14px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.schedule-item.disabled { opacity: 0.5; }
+
+.schedule-toggle { position: relative; width: 48px; height: 26px; flex-shrink: 0; }
+.schedule-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+
+.schedule-toggle .slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: var(--card-border-strong);
+  border-radius: 26px;
+  transition: 0.3s;
+}
+
+.schedule-toggle .slider::before {
+  content: '';
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.schedule-toggle input:checked + .slider { background: var(--success); }
+.schedule-toggle input:checked + .slider::before { transform: translateX(22px); }
+
+.schedule-info { min-width: 0; }
+.schedule-time { font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: 1px; line-height: 1.2; }
+.schedule-relay { font-size: 13px; font-weight: 700; color: var(--text); margin-top: 4px; }
+.schedule-days { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+
+.day-chip {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--primary-soft);
+  color: var(--text-muted);
+}
+
+.day-chip.active { background: var(--primary); color: #fff; }
+
+.schedule-delete {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--danger-medium);
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.empty-schedule { padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 14px; font-weight: 500; }
+.empty-schedule .icon { font-size: 52px; opacity: 0.3; margin-bottom: 12px; }
+
+.schedule-form {
+  background: var(--primary-soft);
+  border: 1px solid var(--primary-strong);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.schedule-form-title { font-size: 14px; font-weight: 800; color: var(--primary); margin-bottom: 14px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.form-row-2 { grid-template-columns: 1fr 1fr; }
+
+.form-label-sm { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; }
+
+.form-input-sm {
+  width: 100%;
+  padding: 12px;
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 600;
+  min-height: 46px;
+}
+
+.form-input-sm.time { font-size: 20px; font-weight: 800; text-align: center; letter-spacing: 2px; }
+
+.days-selector { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+
+.day-btn {
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  min-width: 48px;
+  min-height: 42px;
+}
+
+.day-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.form-actions { display: flex; gap: 8px; margin-top: 14px; }
+.form-actions button {
+  flex: 1;
+  padding: 13px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 14px;
+  min-height: 48px;
+}
+
+.form-actions .save { background: linear-gradient(135deg, var(--primary), #8b5cf6); color: #fff; }
+.form-actions .cancel { background: var(--card-border-strong); color: var(--text); }
+
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--card-border); }
+
+.btn-primary {
+  flex: 1;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 15px;
+  min-height: 50px;
+}
+
+.btn-secondary {
+  flex: 1;
+  padding: 14px;
+  background: var(--card-border-strong);
+  color: var(--text);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 15px;
+  min-height: 50px;
+}
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.app-footer {
+  text-align: center;
+  padding: 20px 12px 30px;
+  margin-top: 20px;
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.9;
+}
+
+.app-footer .footer-brand {
+  font-weight: 800;
+  font-size: 12px;
+  color: var(--primary);
+  cursor: pointer;
+  display: inline-block;
+  margin-bottom: 4px;
+  font-family: var(--font-en);
+  letter-spacing: 0.5px;
+}
+
+.app-footer .footer-brand:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 520px) {
+  body { padding: 10px; }
+  header { padding: 14px; gap: 10px; }
+  .header-top { padding-bottom: 12px; gap: 10px; }
+  .logo-icon { width: 46px; height: 46px; font-size: 22px; border-radius: 13px; }
+  .logo h1 { font-size: 16px; }
+  .logo p { font-size: 11px; }
+  .clock { padding: 10px 14px; border-radius: 13px; min-width: 110px; }
+  .clock .time { font-size: 24px; }
+  .clock .date { font-size: 11px; }
+  .status-badge { padding: 8px 14px; font-size: 13px; flex: 1; justify-content: center; }
+  .icon-btn { width: 44px; height: 44px; font-size: 20px; border-radius: 12px; }
+  .stat-card { padding: 14px 12px; }
+  .stat-icon { width: 44px; height: 44px; font-size: 20px; }
+  .stat-info h3 { font-size: 24px; }
+  .stat-info p { font-size: 12px; }
+  .section-title { font-size: 17px; }
+  .relay-grid { gap: 10px; }
+  .relay-card { padding: 14px 10px; }
+  .relay-number { font-size: 10px; padding: 3px 9px; }
+  .relay-name { font-size: 14px; }
+  .relay-state-icon { font-size: 36px; }
+  .relay-state-text { font-size: 17px; }
+  .btn { font-size: 13px; min-height: 44px; }
+  .panel { padding: 14px; }
+  .chart-wrapper { height: 180px; }
+  .about-company-name { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ============================================================
+     Modal: درباره شرکت
+     ============================================================ -->
+<div class="modal-overlay" id="aboutModal" onclick="handleAboutOverlayClick(event)">
+  <div class="modal about-modal" onclick="event.stopPropagation()">
+    <div class="modal-title">
+      <span>🏢 درباره شرکت</span>
+      <button class="close-btn" onclick="closeAbout()">✕</button>
+    </div>
+
+    <!-- لوگو -->
+    <svg class="about-logo" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+      <!-- کادر خارجی -->
+      <rect x="20" y="15" width="360" height="85" rx="8" fill="#000000"/>
+      <rect x="25" y="20" width="350" height="60" rx="5" fill="#ffffff"/>
+      <!-- TAK -->
+      <text x="200" y="68" font-family="Inter, Arial, sans-serif" font-size="52" font-weight="900" fill="#000000" text-anchor="middle" letter-spacing="4">TAK</text>
+      <!-- نوار پایین -->
+      <rect x="25" y="82" width="350" height="18" fill="#000000"/>
+      <text x="200" y="95" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="3">Industrial Group</text>
+    </svg>
+
+    <div class="about-company-name">تکساز آزما کومش</div>
+    <div class="about-company-tagline">TAK INDUSTRIAL GROUP</div>
+
+    <div class="about-divider"></div>
+
+    <div class="about-section-title">🎯 حوزه فعالیت</div>
+    <div class="about-text">
+      گروه صنعتی <b>تکساز آزما کومش</b>، پیشرو در طراحی و پیاده‌سازی راهکارهای
+      <b>هوشمندسازی صنعتی</b> و <b>Digital Twin</b> است. با تکیه بر دانش بومی و
+      فناوری‌های نوین، آینده‌ای متصل، کارآمد و هوشمند برای صنایع ایران رقم می‌زنیم.
+    </div>
+
+    <div class="about-divider"></div>
+
+    <div class="about-section-title">⚙️ خدمات ما</div>
+    <div class="about-services">
+      <div class="about-service-item">
+        <span class="emoji">🔧</span>
+        <span>طراحی سامانه‌های کنترل هوشمند</span>
+      </div>
+      <div class="about-service-item">
+        <span class="emoji">🌐</span>
+        <span>پیاده‌سازی Digital Twin برای خطوط تولید</span>
+      </div>
+      <div class="about-service-item">
+        <span class="emoji">📊</span>
+        <span>مانیتورینگ بلادرنگ و تحلیل داده صنعتی</span>
+      </div>
+      <div class="about-service-item">
+        <span class="emoji">🤖</span>
+        <span>اتوماسیون صنعتی به سفارش مشتری</span>
+      </div>
+      <div class="about-service-item">
+        <span class="emoji">📡</span>
+        <span>یکپارچه‌سازی IoT و IIoT در محیط صنعتی</span>
+      </div>
+    </div>
+
+    <div class="about-divider"></div>
+
+    <div class="about-section-title">👤 مدیرعامل</div>
+    <div class="about-ceo-box">
+      <div class="about-ceo-name">دکتر مداح</div>
+      <div class="about-ceo-title">مدیرعامل گروه صنعتی تکساز آزما کومش</div>
+    </div>
+
+    <div class="about-divider"></div>
+
+    <div class="about-section-title">📞 راه‌های ارتباطی</div>
+    <div class="about-contact-grid">
+      <a class="about-contact-item" href="mailto:taksazazmakoomesh@gmail.com">
+        <div class="about-contact-icon">📧</div>
+        <div class="about-contact-info">
+          <div class="about-contact-label">ایمیل پشتیبانی</div>
+          <div class="about-contact-value">taksazazmakoomesh@gmail.com</div>
+        </div>
+      </a>
+      <a class="about-contact-item" href="tel:09122316905">
+        <div class="about-contact-icon">📱</div>
+        <div class="about-contact-info">
+          <div class="about-contact-label">تماس مستقیم با مدیرعامل</div>
+          <div class="about-contact-value fa">۰۹۱۲۲۳۱۶۹۰۵</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="about-footer">
+      🌱 نسخه ۱.۰ — کنترلر هوشمند گلخانه<br>
+      <span class="about-version-badge">TAK Industrial Group © 1405</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     Modal: تنظیمات
+     ============================================================ -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal wide">
+    <div class="modal-title">
+      <span>⚙️ تنظیمات</span>
+      <button class="close-btn" onclick="closeSettings()">✕</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(event, 'tab-names')">🏷️ نام‌ها</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-schedule')">⏰ زمان‌بندی</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-mqtt')">🔌 MQTT</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-sheets')">📊 Google Sheets</button>
+    </div>
+
+    <div class="tab-content active" id="tab-names">
+      <div class="form-hint" style="margin-bottom: 14px; text-align: center;">
+        نام دلخواه برای هر کانال رله
+      </div>
+      <div class="names-grid" id="namesGrid"></div>
+    </div>
+
+    <div class="tab-content" id="tab-schedule">
+      <div class="schedule-header">
+        <span class="schedule-count" id="scheduleCount">۰ زمان‌بندی</span>
+        <button class="add-schedule-btn" onclick="showAddSchedule()">➕ افزودن</button>
+      </div>
+      <div id="scheduleFormContainer"></div>
+      <div class="schedule-list" id="scheduleList"></div>
+    </div>
+
+    <div class="tab-content" id="tab-mqtt">
+      <div class="form-group">
+        <label>🌐 آدرس MQTT Broker</label>
+        <input type="text" id="inputBroker" class="ltr" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <div class="form-group">
+        <label>👤 نام کاربری</label>
+        <input type="text" id="inputUser" class="ltr" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <div class="form-group">
+        <label>🔑 رمز عبور</label>
+        <input type="password" id="inputPass" class="ltr" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-sheets">
+      <div class="form-group">
+        <label>📊 Google Sheet ID</label>
+        <input type="text" id="inputSheetId" class="ltr" placeholder="1AbC..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <div class="form-hint">
+          از URL شیت کپی کنید:<br>
+          <code style="background:var(--card-bg-inner);padding:3px 6px;border-radius:4px;font-size:11px;direction:ltr;display:inline-block;margin-top:4px;">
+            docs.google.com/spreadsheets/d/<b>THIS</b>/edit
+          </code>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>🔗 URL اسکریپت Google Sheets</label>
+        <input type="text" id="inputSheetsUrl" class="ltr" placeholder="https://script.google.com/.../exec" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      </div>
+
+      <div class="form-group">
+        <label>📥 دانلود داده‌ها</label>
+        <div class="sheets-actions">
+          <button class="download-btn" onclick="downloadSheet()">📥 دانلود Excel</button>
+          <button class="open-sheet-btn" onclick="openSheetInBrowser()">🌐 باز کردن</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>🧪 تست اتصال</label>
+        <button class="btn-secondary" onclick="testSheetsConnection()" style="width:100%;">🔍 بررسی اتصال</button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="resetSettings()">🔄 بازنشانی</button>
+      <button class="btn-primary" onclick="saveSettings()">💾 ذخیره</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     داشبورد
+     ============================================================ -->
+<div class="container">
+
+  <!-- 📛 نوار لوگو TAK -->
+  <div class="top-brand-bar" onclick="openAbout()" title="درباره شرکت">
+    <svg class="brand-logo-svg" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg">
+      <rect x="20" y="15" width="360" height="85" rx="8" fill="#000000"/>
+      <rect x="25" y="20" width="350" height="60" rx="5" fill="#ffffff"/>
+      <text x="200" y="68" font-family="Inter, Arial, sans-serif" font-size="52" font-weight="900" fill="#000000" text-anchor="middle" letter-spacing="4">TAK</text>
+      <rect x="25" y="82" width="350" height="18" fill="#000000"/>
+      <text x="200" y="95" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="3">Industrial Group</text>
+    </svg>
+    <div class="brand-info-icon">
+      <span>ℹ️</span>
+      <span class="brand-hint">درباره ما</span>
+    </div>
+  </div>
+
+  <header>
+    <div class="header-top">
+      <div class="logo">
+        <div class="logo-icon">⚡</div>
+        <div>
+          <h1>کنترلر هوشمند گلخانه</h1>
+          <p>۸ کانال · Real-time</p>
+        </div>
+      </div>
+      <div class="clock">
+        <div class="time" id="liveTime">--:--:--</div>
+        <div class="date" id="liveDate">---</div>
+      </div>
+    </div>
+
+    <div class="header-bottom">
+      <div class="status-badge" id="statusBadge">
+        <span class="pulse-dot"></span>
+        <span id="statusText">اتصال...</span>
+      </div>
+      <div class="icon-group">
+        <button class="icon-btn" onclick="openSchedulesQuick()" title="زمان‌بندی">⏰</button>
+        <button class="icon-btn" id="themeToggle" title="تم">☀️</button>
+        <button class="icon-btn" onclick="openSettings()" title="تنظیمات">⚙️</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon green">💡</div>
+      <div class="stat-info"><h3 id="statOn">0</h3><p>رله روشن</p></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon red">🔌</div>
+      <div class="stat-info"><h3 id="statOff">8</h3><p>رله خاموش</p></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon blue">🔄</div>
+      <div class="stat-info"><h3 id="statToggles">0</h3><p>کل تغییرات</p></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon yellow">⏰</div>
+      <div class="stat-info"><h3 id="statSchedules">0</h3><p>زمان‌بندی فعال</p></div>
+    </div>
+  </div>
+
+  <div class="section-title">کنترل رله‌ها</div>
+  <div class="relay-grid" id="relayGrid"></div>
+
+  <div class="bottom-grid">
+    <div class="panel">
+      <div class="section-title">فعالیت ۲۴ ساعت اخیر</div>
+      <div class="chart-wrapper">
+        <canvas id="activityChart"></canvas>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="section-title">لاگ زنده</div>
+      <div class="log-container" id="logContainer">
+        <p style="color:var(--text-muted); text-align:center; padding:20px; font-size:13px; font-weight:500;">
+          در انتظار رویداد...
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-footer">
+    <div class="footer-brand" onclick="openAbout()">TAK INDUSTRIAL GROUP</div>
+    <div>© 1405 — تکساز آزما کومش · تمامی حقوق محفوظ است</div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   🧹 پاکسازی اولیه
+   ============================================================ */
+document.body.classList.remove("modal-open");
+document.body.style.position = "";
+document.body.style.top = "";
+document.body.style.width = "";
+document.body.style.height = "";
+document.body.style.overflow = "";
+
+/* ============================================================
+   تاریخ شمسی
+   ============================================================ */
+function formatPersianDateTime(timestampStr) {
+  let date;
+  if (timestampStr && typeof timestampStr === "string") {
+    const m = timestampStr.match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})/);
+    if (m) {
+      date = new Date(
+        parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]),
+        parseInt(m[4]), parseInt(m[5]), parseInt(m[6])
+      );
+    } else date = new Date(timestampStr);
+  }
+  if (!date || isNaN(date.getTime())) date = new Date();
+
+  try {
+    const dateStr = new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+      year: "numeric", month: "2-digit", day: "2-digit"
+    }).format(date);
+    const timeStr = new Intl.DateTimeFormat("fa-IR", {
+      hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+    }).format(date);
+    return `${dateStr} - ${timeStr}`;
+  } catch (e) {
+    return date.toLocaleString("fa-IR");
+  }
+}
+
+const DEFAULT_CONFIG = {
+  BROKER_URL: "wss://270d283dfde943a591fa16c2a7cdcb14.s1.eu.hivemq.cloud:8884/mqtt",
+  USERNAME:   "Ehsan",
+  PASSWORD:   "abcd1234",
+  SHEET_ID:   "1H9DTPQ20xhm_FXtlB1m7eKFR12RGjIykIhQffLqXW-I",
+  SHEETS_URL: "https://script.google.com/macros/s/AKfycbyaGYKSA9r_o0Sn2m3c6klHbsmtSZ_L-4RrBmaYt_aFJ83ofh14Cnxs5gnVN-JWduAi/exec"
+};
+
+const DEFAULT_NAMES = [
+  "کانال ۱", "کانال ۲", "کانال ۳", "کانال ۴",
+  "کانال ۵", "کانال ۶", "کانال ۷", "کانال ۸"
+];
+
+function getConfig() {
+  const saved = localStorage.getItem("relay_config");
+  return saved ? { ...DEFAULT_CONFIG, ...JSON.parse(saved) } : { ...DEFAULT_CONFIG };
+}
+function setConfig(cfg) { localStorage.setItem("relay_config", JSON.stringify(cfg)); }
+function getLocalNames() {
+  const saved = localStorage.getItem("relay_names");
+  return saved ? JSON.parse(saved) : [...DEFAULT_NAMES];
+}
+function setLocalNames(names) { localStorage.setItem("relay_names", JSON.stringify(names)); }
+
+let CONFIG = getConfig();
+CONFIG.TOPIC_CMD       = "esp32/relay/cmd";
+CONFIG.TOPIC_STATE     = "esp32/relay/state";
+CONFIG.TOPIC_NAMES     = "esp32/relay/names";
+CONFIG.TOPIC_NAMES_SET = "esp32/relay/names/set";
+CONFIG.TOPIC_SCHEDULE  = "esp32/relay/schedule";
+CONFIG.TOPIC_SCHED_SET = "esp32/relay/schedule/set";
+CONFIG.TOPIC_SYNC      = "esp32/relay/sync";
+CONFIG.NUM_RELAYS      = 8;
+
+let relayNames = getLocalNames();
+let schedules = [];
+let editingScheduleId = null;
+let selectedDays = [0, 1, 2, 3, 4, 5, 6];
+
+const state = {
+  relays: Array(CONFIG.NUM_RELAYS).fill(false),
+  timestamps: Array(CONFIG.NUM_RELAYS).fill(""),
+  toggles: 0,
+  connectedAt: null,
+  hourActivity: Array(24).fill(0)
+};
+
+const DAY_LABELS = ["ش", "ی", "د", "س", "چ", "پ", "ج"];
+const DAY_NAMES  = ["شنبه", "یک‌شنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"];
+const relayIcons = ["💡", "🔆", "🌡️", "❄️", "🌀", "🔔", "🎛️", "⚙️"];
+
+/* ============================================================
+   ساعت
+   ============================================================ */
+function updateClock() {
+  const now = new Date();
+  document.getElementById("liveTime").textContent =
+    now.toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  document.getElementById("liveDate").textContent =
+    new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+      year: "numeric", month: "long", day: "numeric"
+    }).format(now);
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ============================================================
+   تم
+   ============================================================ */
+const themeToggle = document.getElementById("themeToggle");
+const savedTheme = localStorage.getItem("theme") || "light";
+document.documentElement.setAttribute("data-theme", savedTheme);
+themeToggle.textContent = savedTheme === "dark" ? "🌙" : "☀️";
+
+themeToggle.addEventListener("click", () => {
+  const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  themeToggle.textContent = next === "dark" ? "🌙" : "☀️";
+  localStorage.setItem("theme", next);
+});
+
+/* ============================================================
+   کارت‌های رله
+   ============================================================ */
+const relayGrid = document.getElementById("relayGrid");
+
+function renderCards() {
+  relayGrid.innerHTML = "";
+  for (let i = 0; i < CONFIG.NUM_RELAYS; i++) {
+    const card = document.createElement("div");
+    card.className = "relay-card";
+    card.id = `relay-${i}`;
+    card.innerHTML = `
+      <span class="relay-number">کانال ${i + 1}</span>
+      <div class="relay-name" id="name-${i}">${relayNames[i]}</div>
+      <div class="relay-state-icon">${relayIcons[i]}</div>
+      <div class="relay-state-text" id="state-${i}">خاموش</div>
+      <div class="relay-time" id="time-${i}">--</div>
+      <div class="sparkline-wrap">
+        <canvas class="sparkline-canvas" id="spark-${i}"></canvas>
+      </div>
+      <div class="relay-actions">
+        <button class="btn btn-on" onclick="sendCommand(${i + 1}, 'ON')">روشن</button>
+        <button class="btn btn-off" onclick="sendCommand(${i + 1}, 'OFF')">خاموش</button>
+      </div>
+    `;
+    relayGrid.appendChild(card);
+    initSparkline(i);
+  }
+}
+
+function updateAllNames(newNames) {
+  relayNames = newNames;
+  setLocalNames(newNames);
+  for (let i = 0; i < CONFIG.NUM_RELAYS; i++) {
+    const el = document.getElementById(`name-${i}`);
+    if (el) el.textContent = newNames[i];
+  }
+}
+
+/* ============================================================
+   Sparkline
+   ============================================================ */
+const sparkCharts = [];
+
+function initSparkline(idx) {
+  const canvas = document.getElementById(`spark-${idx}`);
+  if (!canvas) return;
+  sparkCharts[idx] = new Chart(canvas.getContext("2d"), {
+    type: "line",
+    data: {
+      labels: Array(20).fill(""),
+      datasets: [{
+        data: Array(20).fill(0),
+        borderColor: "#10b981",
+        backgroundColor: "rgba(16, 185, 129, 0.15)",
+        fill: true,
+        tension: 0.4,
+        pointRadius: 0,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: { x: { display: false }, y: { display: false, min: 0, max: 1 } },
+      animation: { duration: 300 }
+    }
+  });
+}
+
+function updateSparkline(idx, isOn) {
+  const chart = sparkCharts[idx];
+  if (!chart) return;
+  chart.data.datasets[0].data.shift();
+  chart.data.datasets[0].data.push(isOn ? 1 : 0);
+  chart.data.datasets[0].borderColor = isOn ? "#10b981" : "#ef4444";
+  chart.data.datasets[0].backgroundColor = isOn
+    ? "rgba(16, 185, 129, 0.15)"
+    : "rgba(239, 68, 68, 0.1)";
+  chart.update("none");
+}
+
+/* ============================================================
+   نمودار اصلی
+   ============================================================ */
+const activityChart = new Chart(
+  document.getElementById("activityChart").getContext("2d"),
+  {
+    type: "line",
+    data: {
+      labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
+      datasets: [{
+        label: "فعالیت",
+        data: state.hourActivity,
+        borderColor: "#6366f1",
+        backgroundColor: (ctx) => {
+          const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 220);
+          g.addColorStop(0, "rgba(99, 102, 241, 0.4)");
+          g.addColorStop(1, "rgba(99, 102, 241, 0)");
+          return g;
+        },
+        fill: true,
+        tension: 0.45,
+        pointRadius: 3,
+        pointBackgroundColor: "#6366f1",
+        pointBorderColor: "#fff",
+        pointBorderWidth: 2,
+        borderWidth: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { color: "#94a3b8", font: { family: 'Vazirmatn', size: 11 } },
+          grid: { color: "rgba(148, 163, 184, 0.1)" }
+        },
+        x: {
+          ticks: { color: "#94a3b8", font: { family: 'Vazirmatn', size: 11 }, maxRotation: 0 },
+          grid: { display: false }
+        }
+      }
+    }
+  }
+);
+
+/* ============================================================
+   Toast
+   ============================================================ */
+function showToast(message, type = "info") {
+  const icons = { success: "✅", error: "❌", info: "ℹ️" };
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<span style="font-size:18px;">${icons[type]}</span><span>${message}</span>`;
+  document.getElementById("toastContainer").appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add("hide");
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
+}
+
+/* ============================================================
+   MQTT
+   ============================================================ */
+let mqttClient = null;
+
+function connectMQTT() {
+  if (mqttClient) { try { mqttClient.end(true); } catch (e) {} }
+
+  const statusBadge = document.getElementById("statusBadge");
+  const statusText  = document.getElementById("statusText");
+
+  try {
+    mqttClient = mqtt.connect(CONFIG.BROKER_URL, {
+      username: CONFIG.USERNAME,
+      password: CONFIG.PASSWORD,
+      clientId: "Greenhouse_" + Math.random().toString(16).substr(2, 8),
+      clean: true,
+      connectTimeout: 10000,
+      reconnectPeriod: 3000,
+      keepalive: 30
+    });
+  } catch (e) {
+    console.error("MQTT init error:", e);
+    showToast("خطا در راه‌اندازی MQTT", "error");
+    return;
+  }
+
+  mqttClient.on("connect", () => {
+    statusBadge.classList.add("connected");
+    statusText.textContent = "متصل";
+    state.connectedAt = Date.now();
+
+    mqttClient.subscribe(CONFIG.TOPIC_STATE, { qos: 1 });
+    mqttClient.subscribe(CONFIG.TOPIC_NAMES, { qos: 1 });
+    mqttClient.subscribe(CONFIG.TOPIC_SCHEDULE, { qos: 1 });
+
+    setTimeout(() => {
+      if (mqttClient && mqttClient.connected) {
+        mqttClient.publish(
+          CONFIG.TOPIC_SYNC,
+          JSON.stringify({ action: "sync", timestamp: Date.now() }),
+          { qos: 1 }
+        );
+      }
+    }, 400);
+
+    showToast("اتصال به بروکر برقرار شد", "success");
+  });
+
+  mqttClient.on("reconnect", () => {
+    statusBadge.classList.remove("connected");
+    statusText.textContent = "اتصال مجدد...";
+  });
+
+  mqttClient.on("offline", () => {
+    statusBadge.classList.remove("connected");
+    statusText.textContent = "آفلاین";
+  });
+
+  mqttClient.on("error", (err) => {
+    console.error("MQTT Error:", err);
+    statusText.textContent = "خطای اتصال";
+  });
+
+  mqttClient.on("message", (topic, payload) => {
+    try {
+      if (topic === CONFIG.TOPIC_NAMES) {
+        const data = JSON.parse(payload.toString());
+        if (data && Array.isArray(data.names)) {
+          const n = data.names.slice(0, 8);
+          while (n.length < 8) n.push(`کانال ${n.length + 1}`);
+          updateAllNames(n);
+        }
+        return;
+      }
+
+      if (topic === CONFIG.TOPIC_SCHEDULE) {
+        const data = JSON.parse(payload.toString());
+        if (data && Array.isArray(data.schedules)) {
+          schedules = data.schedules;
+          renderScheduleList();
+          updateSchedulesStats();
+        }
+        return;
+      }
+
+      if (topic === CONFIG.TOPIC_STATE) {
+        const data = JSON.parse(payload.toString());
+        const idx = data.relay - 1;
+        if (idx < 0 || idx >= CONFIG.NUM_RELAYS) return;
+
+        const isOn = (data.state === "ON" || data.state === "1");
+        const wasOn = state.relays[idx];
+
+        state.relays[idx] = isOn;
+        state.timestamps[idx] = data.timestamp || new Date().toISOString();
+
+        if (data.name && data.name !== relayNames[idx]) {
+          relayNames[idx] = data.name;
+          setLocalNames(relayNames);
+          const nameEl = document.getElementById(`name-${idx}`);
+          if (nameEl) nameEl.textContent = data.name;
+        }
+
+        updateCard(idx);
+        updateStats();
+        updateSparkline(idx, isOn);
+
+        if (wasOn !== isOn) {
+          state.toggles++;
+          state.hourActivity[new Date().getHours()]++;
+          activityChart.update();
+        }
+
+        addLog(data.relay, data.state, data.timestamp, data.source);
+
+        if (data.source !== "boot" && data.source !== "sync") {
+          showToast(
+            `${relayNames[idx]} ${isOn ? "روشن" : "خاموش"} شد`,
+            isOn ? "success" : "error"
+          );
+        }
+      }
+    } catch (e) {
+      console.error("Parse error:", e);
+    }
+  });
+}
+
+function sendCommand(relayNum, stateVal) {
+  if (!mqttClient || !mqttClient.connected) {
+    showToast("اتصال برقرار نیست", "error");
+    return;
+  }
+  mqttClient.publish(
+    CONFIG.TOPIC_CMD,
+    JSON.stringify({ relay: relayNum, state: stateVal }),
+    { qos: 1 }
+  );
+}
+
+/* ============================================================
+   به‌روزرسانی UI
+   ============================================================ */
+function updateCard(index) {
+  const card = document.getElementById(`relay-${index}`);
+  const stateEl = document.getElementById(`state-${index}`);
+  const timeEl = document.getElementById(`time-${index}`);
+  if (!card) return;
+  const isOn = state.relays[index];
+  card.classList.toggle("on", isOn);
+  stateEl.textContent = isOn ? "روشن" : "خاموش";
+  timeEl.textContent = formatPersianDateTime(state.timestamps[index]);
+}
+
+function updateStats() {
+  const onCount = state.relays.filter(Boolean).length;
+  document.getElementById("statOn").textContent = onCount;
+  document.getElementById("statOff").textContent = CONFIG.NUM_RELAYS - onCount;
+  document.getElementById("statToggles").textContent = state.toggles;
+}
+
+function updateSchedulesStats() {
+  const active = schedules.filter(s => s.enabled).length;
+  document.getElementById("statSchedules").textContent = active;
+  document.getElementById("scheduleCount").textContent =
+    `${schedules.length} زمان‌بندی (${active} فعال)`;
+}
+
+/* ============================================================
+   لاگ
+   ============================================================ */
+const logContainer = document.getElementById("logContainer");
+let logCount = 0;
+const MAX_LOGS = 40;
+
+function addLog(relayNum, stateVal, timestamp, source) {
+  if (logCount === 0) logContainer.innerHTML = "";
+  logCount++;
+  const isOn = (stateVal === "ON" || stateVal === "1");
+  const persianTime = formatPersianDateTime(timestamp);
+
+  const sourceLabel = {
+    "MQTT": "دستی",
+    "SCHEDULE": "⏰",
+    "boot": "بوت",
+    "sync": "همگام",
+    "TEST": "تست"
+  }[source] || source;
+
+  const entry = document.createElement("div");
+  entry.className = `log-entry ${isOn ? "on" : "off"}`;
+  entry.innerHTML = `
+    <span class="log-icon">${isOn ? "🟢" : "🔴"}</span>
+    <div class="log-content">
+      <div class="log-row-1">
+        <span class="log-relay">${relayNames[relayNum - 1]}</span>
+        <span class="log-state" style="color:${isOn ? "var(--success)" : "var(--danger)"};">
+          ${isOn ? "روشن" : "خاموش"}
+          <small style="opacity:0.6; font-size:11px;">(${sourceLabel})</small>
+        </span>
+      </div>
+      <div class="log-row-2">
+        <span class="log-time">🕒 ${persianTime}</span>
+      </div>
+    </div>
+  `;
+  logContainer.prepend(entry);
+  while (logContainer.children.length > MAX_LOGS) logContainer.lastChild.remove();
+}
+
+/* ============================================================
+   زمان‌بندی
+   ============================================================ */
+function renderScheduleList() {
+  const list = document.getElementById("scheduleList");
+  if (!schedules.length) {
+    list.innerHTML = `
+      <div class="empty-schedule">
+        <div class="icon">⏰</div>
+        <div>هیچ زمان‌بندی‌ای تنظیم نشده</div>
+      </div>
+    `;
+    return;
+  }
+
+  const sorted = [...schedules].sort((a, b) => (a.hour * 60 + a.minute) - (b.hour * 60 + b.minute));
+
+  list.innerHTML = "";
+  sorted.forEach(s => {
+    const daysMask = s.days || 0x7F;
+    const daysHtml = DAY_LABELS.map((lbl, i) => {
+      const active = (daysMask >> i) & 1;
+      return `<span class="day-chip ${active ? "active" : ""}">${lbl}</span>`;
+    }).join("");
+
+    const item = document.createElement("div");
+    item.className = `schedule-item ${s.enabled ? "" : "disabled"}`;
+    item.innerHTML = `
+      <label class="schedule-toggle">
+        <input type="checkbox" ${s.enabled ? "checked" : ""} onchange="toggleSchedule(${s.id}, this.checked)">
+        <span class="slider"></span>
+      </label>
+      <div class="schedule-info">
+        <div class="schedule-time">${String(s.hour).padStart(2, "0")}:${String(s.minute).padStart(2, "0")}</div>
+        <div class="schedule-relay">${relayIcons[s.relay - 1]} ${relayNames[s.relay - 1]}</div>
+        <div class="schedule-days">${daysHtml}</div>
+      </div>
+      <button class="schedule-delete" onclick="deleteSchedule(${s.id})">🗑️</button>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function showAddSchedule() {
+  editingScheduleId = null;
+  selectedDays = [0, 1, 2, 3, 4, 5, 6];
+  renderScheduleForm();
+}
+
+function renderScheduleForm(existing = null) {
+  const container = document.getElementById("scheduleFormContainer");
+  const now = new Date();
+  const defaultHour = existing ? existing.hour : now.getHours();
+  const defaultMin  = existing ? existing.minute : Math.ceil(now.getMinutes() / 5) * 5 % 60;
+  const defaultRelay = existing ? existing.relay : 1;
+  const defaultAction = existing ? existing.action : "ON";
+
+  const daysHtml = DAY_LABELS.map((lbl, i) => {
+    const active = selectedDays.includes(i);
+    return `<button type="button" class="day-btn ${active ? "active" : ""}" onclick="toggleDay(${i})">${DAY_NAMES[i]}</button>`;
+  }).join("");
+
+  container.innerHTML = `
+    <div class="schedule-form">
+      <div class="schedule-form-title">${existing ? "✏️ ویرایش" : "➕ افزودن"}</div>
+
+      <div class="form-row">
+        <div><label class="form-label-sm">ساعت</label><input type="number" id="schedHour" class="form-input-sm time" min="0" max="23" value="${defaultHour}" inputmode="numeric"></div>
+        <div><label class="form-label-sm">دقیقه</label><input type="number" id="schedMin" class="form-input-sm time" min="0" max="59" value="${String(defaultMin).padStart(2, "0")}" inputmode="numeric"></div>
+        <div><label class="form-label-sm">عملکرد</label>
+          <select id="schedAction" class="form-input-sm">
+            <option value="ON" ${defaultAction === "ON" ? "selected" : ""}>💡 روشن</option>
+            <option value="OFF" ${defaultAction === "OFF" ? "selected" : ""}>🔴 خاموش</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row form-row-2">
+        <div><label class="form-label-sm">رله</label>
+          <select id="schedRelay" class="form-input-sm">
+            ${relayNames.map((n, i) => `<option value="${i + 1}" ${defaultRelay === i + 1 ? "selected" : ""}>${relayIcons[i]} ${n}</option>`).join("")}
+          </select>
+        </div>
+        <div><label class="form-label-sm">وضعیت</label>
+          <select id="schedEnabled" class="form-input-sm">
+            <option value="1" ${(!existing || existing.enabled) ? "selected" : ""}>✅ فعال</option>
+            <option value="0" ${(existing && !existing.enabled) ? "selected" : ""}>⏸ غیرفعال</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="form-label-sm">روزهای هفته</label>
+        <div class="days-selector">${daysHtml}</div>
+      </div>
+
+      <div class="form-actions">
+        <button class="cancel" onclick="cancelScheduleForm()">انصراف</button>
+        <button class="save" onclick="submitSchedule()">${existing ? "💾 ذخیره" : "➕ افزودن"}</button>
+      </div>
+    </div>
+  `;
+}
+
+function toggleDay(idx) {
+  const hEl = document.getElementById("schedHour");
+  const mEl = document.getElementById("schedMin");
+  const h = hEl ? hEl.value : "0";
+  const m = mEl ? mEl.value : "0";
+  const i = selectedDays.indexOf(idx);
+  if (i >= 0) selectedDays.splice(i, 1);
+  else selectedDays.push(idx);
+  selectedDays.sort((a, b) => a - b);
+  const existing = editingScheduleId ? schedules.find(s => s.id === editingScheduleId) : null;
+  renderScheduleForm(existing);
+  setTimeout(() => {
+    const hEl2 = document.getElementById("schedHour");
+    const mEl2 = document.getElementById("schedMin");
+    if (hEl2) hEl2.value = h;
+    if (mEl2) mEl2.value = m;
+  }, 0);
+}
+
+function cancelScheduleForm() {
+  document.getElementById("scheduleFormContainer").innerHTML = "";
+  editingScheduleId = null;
+}
+
+function submitSchedule() {
+  const hour   = parseInt(document.getElementById("schedHour").value);
+  const minute = parseInt(document.getElementById("schedMin").value);
+  const relay  = parseInt(document.getElementById("schedRelay").value);
+  const action = document.getElementById("schedAction").value;
+  const enabled = document.getElementById("schedEnabled").value === "1";
+
+  if (isNaN(hour) || hour < 0 || hour > 23) { showToast("ساعت 0-23", "error"); return; }
+  if (isNaN(minute) || minute < 0 || minute > 59) { showToast("دقیقه 0-59", "error"); return; }
+  if (!selectedDays.length) { showToast("حداقل یک روز", "error"); return; }
+
+  let daysMask = 0;
+  selectedDays.forEach(d => daysMask |= (1 << d));
+
+  if (editingScheduleId !== null) {
+    const idx = schedules.findIndex(s => s.id === editingScheduleId);
+    if (idx >= 0) schedules[idx] = { ...schedules[idx], hour, minute, relay, action, days: daysMask, enabled };
+  } else {
+    const newId = schedules.length ? Math.max(...schedules.map(s => s.id)) + 1 : 1;
+    schedules.push({ id: newId, hour, minute, relay, action, days: daysMask, enabled });
+  }
+
+  pushSchedulesToESP32();
+  cancelScheduleForm();
+  renderScheduleList();
+  updateSchedulesStats();
+  showToast("ذخیره شد", "success");
+  editingScheduleId = null;
+}
+
+function toggleSchedule(id, enabled) {
+  const s = schedules.find(x => x.id === id);
+  if (!s) return;
+  s.enabled = enabled;
+  pushSchedulesToESP32();
+  renderScheduleList();
+  updateSchedulesStats();
+}
+
+function deleteSchedule(id) {
+  if (!confirm("حذف شود؟")) return;
+  schedules = schedules.filter(s => s.id !== id);
+  pushSchedulesToESP32();
+  renderScheduleList();
+  updateSchedulesStats();
+}
+
+function pushSchedulesToESP32() {
+  localStorage.setItem("relay_schedules", JSON.stringify(schedules));
+  if (!mqttClient || !mqttClient.connected) return;
+  mqttClient.publish(CONFIG.TOPIC_SCHED_SET, JSON.stringify({ schedules }), { qos: 1 });
+}
+
+/* ============================================================
+   Modal
+   ============================================================ */
+function switchTab(evt, tabId) {
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+  evt.currentTarget.classList.add("active");
+  document.getElementById(tabId).classList.add("active");
+}
+
+function renderNamesGrid() {
+  const grid = document.getElementById("namesGrid");
+  grid.innerHTML = "";
+  for (let i = 0; i < CONFIG.NUM_RELAYS; i++) {
+    const item = document.createElement("div");
+    item.className = "name-item";
+    item.innerHTML = `
+      <div class="name-item-icon">${relayIcons[i]}</div>
+      <span class="name-item-num">#${i + 1}</span>
+      <input type="text" id="name-input-${i}" value="${relayNames[i]}" maxlength="20" placeholder="نام..." autocomplete="off" autocorrect="off" spellcheck="false">
+    `;
+    grid.appendChild(item);
+  }
+}
+
+/* ============================================================
+   قفل و بازکردن اسکرول
+   ============================================================ */
+function lockBodyScroll() {
+  document.body.classList.add("modal-open");
+}
+
+function unlockBodyScroll() {
+  document.body.classList.remove("modal-open");
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.width = "";
+  document.body.style.height = "";
+  document.body.style.overflow = "";
+}
+
+/* ============================================================
+   باز/بستن About
+   ============================================================ */
+function openAbout() {
+  lockBodyScroll();
+  document.getElementById("aboutModal").classList.add("active");
+}
+
+function closeAbout() {
+  document.getElementById("aboutModal").classList.remove("active");
+  unlockBodyScroll();
+}
+
+function handleAboutOverlayClick(e) {
+  if (e.target === document.getElementById("aboutModal")) {
+    closeAbout();
+  }
+}
+
+/* ============================================================
+   باز/بستن تنظیمات
+   ============================================================ */
+function openSettings() {
+  document.getElementById("inputBroker").value = CONFIG.BROKER_URL;
+  document.getElementById("inputUser").value = CONFIG.USERNAME;
+  document.getElementById("inputPass").value = CONFIG.PASSWORD;
+  document.getElementById("inputSheetId").value = CONFIG.SHEET_ID || "";
+  document.getElementById("inputSheetsUrl").value = CONFIG.SHEETS_URL || "";
+  renderNamesGrid();
+  renderScheduleList();
+  updateSchedulesStats();
+
+  lockBodyScroll();
+  document.getElementById("settingsModal").classList.add("active");
+}
+
+function closeSettings() {
+  document.getElementById("settingsModal").classList.remove("active");
+  cancelScheduleForm();
+  unlockBodyScroll();
+}
+
+function openSchedulesQuick() {
+  openSettings();
+  const btns = document.querySelectorAll(".tab-btn");
+  btns.forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+  btns[1].classList.add("active");
+  document.getElementById("tab-schedule").classList.add("active");
+}
+
+function saveSettings() {
+  const newNames = [];
+  for (let i = 0; i < CONFIG.NUM_RELAYS; i++) {
+    const input = document.getElementById(`name-input-${i}`);
+    newNames.push((input && input.value ? input.value : "").trim() || `کانال ${i + 1}`);
+  }
+  updateAllNames(newNames);
+
+  const newCfg = {
+    ...CONFIG,
+    BROKER_URL: document.getElementById("inputBroker").value.trim(),
+    USERNAME:   document.getElementById("inputUser").value.trim(),
+    PASSWORD:   document.getElementById("inputPass").value,
+    SHEET_ID:   document.getElementById("inputSheetId").value.trim(),
+    SHEETS_URL: document.getElementById("inputSheetsUrl").value.trim()
+  };
+
+  const brokerChanged = (newCfg.BROKER_URL !== CONFIG.BROKER_URL) ||
+                        (newCfg.USERNAME !== CONFIG.USERNAME) ||
+                        (newCfg.PASSWORD !== CONFIG.PASSWORD);
+
+  CONFIG = newCfg;
+  setConfig(CONFIG);
+
+  if (mqttClient && mqttClient.connected) {
+    mqttClient.publish(CONFIG.TOPIC_NAMES_SET, JSON.stringify({ names: newNames }), { qos: 1 });
+    showToast("ذخیره شد", "success");
+  } else {
+    showToast("محلی ذخیره شد", "info");
+  }
+
+  closeSettings();
+  if (brokerChanged) { showToast("اتصال مجدد...", "info"); connectMQTT(); }
+}
+
+function resetSettings() {
+  if (confirm("همه تنظیمات پاک شود؟")) {
+    localStorage.removeItem("relay_config");
+    localStorage.removeItem("relay_names");
+    localStorage.removeItem("relay_schedules");
+    location.reload();
+  }
+}
+
+function downloadSheet() {
+  if (!CONFIG.SHEET_ID) {
+    showToast("Sheet ID را وارد کنید", "error");
+    return;
+  }
+  const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/export?format=xlsx`;
+  window.open(url, "_blank");
+  showToast("دانلود شروع شد", "success");
+}
+
+function openSheetInBrowser() {
+  if (!CONFIG.SHEET_ID) {
+    showToast("Sheet ID را وارد کنید", "error");
+    return;
+  }
+  window.open(`https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/edit`, "_blank");
+  showToast("شیت باز شد", "info");
+}
+
+function testSheetsConnection() {
+  if (!CONFIG.SHEET_ID) {
+    showToast("Sheet ID خالی است", "error");
+    return;
+  }
+  showToast("در حال تست...", "info");
+  const testUrl = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/export?format=xlsx`;
+  fetch(testUrl, { method: "HEAD" })
+    .then(response => {
+      if (response.ok) showToast("✅ شیت قابل دسترسی است", "success");
+      else if (response.status === 401 || response.status === 403) showToast("❌ شیت خصوصی است", "error");
+      else if (response.status === 404) showToast("❌ Sheet ID اشتباه", "error");
+      else showToast(`⚠️ ${response.status}`, "info");
+    })
+    .catch(() => showToast("خطای تست", "error"));
+}
+
+/* ============================================================
+   شروع
+   ============================================================ */
+try {
+  const localSched = localStorage.getItem("relay_schedules");
+  if (localSched) schedules = JSON.parse(localSched);
+} catch (e) {}
+
+renderCards();
+updateStats();
+renderScheduleList();
+updateSchedulesStats();
+connectMQTT();
+
+console.log("🌱 Greenhouse Dashboard Ready — TAK Industrial Group");
+</script>
+</body>
+</html>

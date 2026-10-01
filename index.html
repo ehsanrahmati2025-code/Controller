@@ -31,6 +31,8 @@
   --danger-medium: rgba(239, 68, 68, 0.15);
   --warning: #f59e0b;
   --warning-soft: rgba(245, 158, 11, 0.15);
+  --water: #0ea5e9;
+  --water-glow: rgba(14, 165, 233, 0.5);
   --bg-1: #0a0e1a;
   --bg-2: #131829;
   --card-bg: rgba(30, 41, 59, 0.55);
@@ -108,9 +110,7 @@ body {
   overflow-y: auto;
 }
 
-body.modal-open {
-  overflow: hidden !important;
-}
+body.modal-open { overflow: hidden !important; }
 
 @keyframes gradientShift {
   0%, 100% { background-position: 0% 50%; }
@@ -141,7 +141,7 @@ body::before {
 }
 
 /* ============================================================
-   📛 نوار بالای صفحه — لوگوی TAK
+   نوار لوگو
    ============================================================ */
 .top-brand-bar {
   display: flex;
@@ -158,7 +158,6 @@ body::before {
   cursor: pointer;
   transition: all 0.3s;
   user-select: none;
-  -webkit-tap-highlight-color: transparent;
 }
 
 .top-brand-bar:hover {
@@ -167,23 +166,12 @@ body::before {
   box-shadow: 0 8px 24px var(--primary-glow);
 }
 
-.top-brand-bar:active {
-  transform: scale(0.98);
-}
+.top-brand-bar:active { transform: scale(0.98); }
 
-.brand-logo-svg {
-  height: 48px;
-  width: auto;
-  display: block;
-  transition: all 0.3s;
-}
-
-[data-theme="dark"] .brand-logo-svg .logo-fill-white { fill: #f1f5f9; }
-[data-theme="dark"] .brand-logo-svg .logo-fill-black { fill: #0a0e1a; }
+.brand-logo-svg { height: 48px; width: auto; display: block; }
 
 .brand-info-icon {
   margin-right: auto;
-  margin-left: 0;
   font-size: 14px;
   color: var(--text-muted);
   display: flex;
@@ -193,15 +181,8 @@ body::before {
   transition: all 0.3s;
 }
 
-.top-brand-bar:hover .brand-info-icon {
-  color: var(--primary);
-  opacity: 1;
-}
-
-.brand-hint {
-  font-size: 11px;
-  font-weight: 500;
-}
+.top-brand-bar:hover .brand-info-icon { color: var(--primary); opacity: 1; }
+.brand-hint { font-size: 11px; font-weight: 500; }
 
 @media (max-width: 520px) {
   .top-brand-bar { padding: 8px 12px; margin-bottom: 10px; }
@@ -245,10 +226,11 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
   box-shadow: 0 0 24px var(--primary-glow);
   flex-shrink: 0;
 }
+
+.logo-icon svg { width: 30px; height: 30px; }
 
 .logo h1 {
   font-size: 19px;
@@ -312,17 +294,19 @@ header {
   background: var(--card-bg);
   color: var(--text);
   cursor: pointer;
-  font-size: 22px;
   transition: all 0.25s;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font);
   touch-action: manipulation;
 }
 
-.icon-btn:active { background: var(--primary); transform: scale(0.92); border-color: var(--primary); }
+.icon-btn svg { width: 22px; height: 22px; }
+.icon-btn:active { background: var(--primary); transform: scale(0.92); border-color: var(--primary); color: #fff; }
 
+/* ============================================================
+   آمار
+   ============================================================ */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -354,14 +338,16 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
   flex-shrink: 0;
 }
 
-.stat-icon.blue { background: var(--primary-soft); }
-.stat-icon.green { background: var(--success-soft); }
-.stat-icon.red { background: var(--danger-soft); }
-.stat-icon.yellow { background: var(--warning-soft); }
+.stat-icon svg { width: 26px; height: 26px; }
+
+.stat-icon.blue { background: var(--primary-soft); color: var(--primary); }
+.stat-icon.green { background: var(--success-soft); color: var(--success); }
+.stat-icon.red { background: var(--danger-soft); color: var(--danger); }
+.stat-icon.yellow { background: var(--warning-soft); color: var(--warning); }
+.stat-icon.water { background: rgba(14, 165, 233, 0.1); color: var(--water); }
 
 .stat-info { min-width: 0; text-align: right; flex: 1; }
 .stat-info h3 { font-size: 28px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
@@ -385,6 +371,9 @@ header {
   border-radius: 4px;
 }
 
+/* ============================================================
+   کارت رله (با آیکون شیربرقی)
+   ============================================================ */
 .relay-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -439,20 +428,48 @@ header {
   white-space: nowrap;
 }
 
-.relay-state-icon {
-  font-size: 42px;
-  margin: 6px 0;
-  filter: grayscale(1) opacity(0.5);
+/* آیکون شیربرقی */
+.valve-icon-wrap {
+  width: 100%;
+  height: 78px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px 0;
   transition: all 0.4s;
-  line-height: 1;
 }
 
-.relay-card.on .relay-state-icon { filter: none; animation: bulbGlow 2s ease-in-out infinite; }
-
-@keyframes bulbGlow {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px var(--success)); }
-  50% { transform: scale(1.08); filter: drop-shadow(0 0 25px var(--success)); }
+.valve-icon-wrap svg {
+  width: 90px;
+  height: 78px;
+  transition: all 0.4s;
+  filter: grayscale(0.7) opacity(0.55);
 }
+
+.relay-card.on .valve-icon-wrap svg {
+  filter: none;
+  animation: valveGlow 2s ease-in-out infinite;
+}
+
+@keyframes valveGlow {
+  0%, 100% { filter: drop-shadow(0 0 8px var(--success)) drop-shadow(0 0 4px var(--water)); }
+  50% { filter: drop-shadow(0 0 16px var(--success)) drop-shadow(0 0 8px var(--water)); }
+}
+
+/* رنگ‌های داخل SVG - قابل تغییر با CSS */
+.valve-body { fill: #475569; transition: fill 0.4s; }
+.valve-coil { fill: #1e293b; transition: fill 0.4s; }
+.valve-wire { stroke: #94a3b8; transition: stroke 0.4s; }
+.valve-pipe { fill: #64748b; transition: fill 0.4s; }
+.valve-flange { fill: #334155; transition: fill 0.4s; }
+.valve-detail { stroke: #94a3b8; transition: stroke 0.4s; }
+
+.relay-card.on .valve-body { fill: #059669; }
+.relay-card.on .valve-coil { fill: #10b981; }
+.relay-card.on .valve-wire { stroke: #fbbf24; }
+.relay-card.on .valve-pipe { fill: #0ea5e9; }
+.relay-card.on .valve-flange { fill: #0284c7; }
+.relay-card.on .valve-detail { stroke: #d1fae5; }
 
 .relay-state-text {
   font-size: 20px;
@@ -495,6 +512,9 @@ header {
 .btn-on { background: linear-gradient(135deg, #10b981, #059669); }
 .btn-off { background: linear-gradient(135deg, #ef4444, #dc2626); }
 
+/* ============================================================
+   پنل‌ها
+   ============================================================ */
 .bottom-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -547,7 +567,15 @@ header {
 
 .log-entry.on { border-right-color: var(--success); }
 .log-entry.off { border-right-color: var(--danger); }
-.log-icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+
+.log-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  width: 18px;
+  height: 18px;
+}
+
+.log-icon svg { width: 100%; height: 100%; }
 
 .log-content { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .log-row-1 { display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: wrap; }
@@ -556,6 +584,9 @@ header {
 .log-state { font-weight: 700; font-size: 13px; }
 .log-time { font-size: 11px; color: var(--text-muted); }
 
+/* ============================================================
+   Toast
+   ============================================================ */
 .toast-container {
   position: fixed;
   bottom: 20px;
@@ -591,6 +622,8 @@ header {
 .toast.success { border-right: 4px solid var(--success); }
 .toast.error { border-right: 4px solid var(--danger); }
 .toast.info { border-right: 4px solid var(--primary); }
+
+.toast svg { width: 18px; height: 18px; flex-shrink: 0; }
 
 @keyframes toastIn {
   from { opacity: 0; transform: translateY(60px); }
@@ -656,6 +689,13 @@ header {
   border-bottom: 1px solid var(--card-border);
 }
 
+.modal-title .title-icon {
+  width: 26px;
+  height: 26px;
+  color: var(--primary);
+  margin-left: 8px;
+}
+
 .close-btn {
   width: 38px;
   height: 38px;
@@ -664,23 +704,20 @@ header {
   background: var(--danger-medium);
   color: var(--danger);
   cursor: pointer;
-  font-size: 18px;
   transition: all 0.25s;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font);
   flex-shrink: 0;
 }
 
+.close-btn svg { width: 18px; height: 18px; }
 .close-btn:active { background: var(--danger); color: #fff; transform: scale(0.9); }
 
 /* ============================================================
-   About Modal (شرکت)
+   About Modal
    ============================================================ */
-.about-modal {
-  text-align: center;
-}
+.about-modal { text-align: center; }
 
 .about-logo {
   height: 70px;
@@ -688,9 +725,6 @@ header {
   display: block;
   margin: 0 auto 20px;
 }
-
-[data-theme="dark"] .about-logo .logo-fill-white { fill: #f1f5f9; }
-[data-theme="dark"] .about-logo .logo-fill-black { fill: #0a0e1a; }
 
 .about-company-name {
   font-size: 22px;
@@ -729,6 +763,8 @@ header {
   gap: 8px;
 }
 
+.about-section-title svg { width: 18px; height: 18px; }
+
 .about-text {
   font-size: 14px;
   font-weight: 500;
@@ -759,10 +795,7 @@ header {
   border-right: 3px solid var(--primary);
 }
 
-.about-service-item .emoji {
-  font-size: 16px;
-  flex-shrink: 0;
-}
+.about-service-item svg { width: 18px; height: 18px; color: var(--primary); flex-shrink: 0; }
 
 .about-contact-grid {
   display: grid;
@@ -788,10 +821,7 @@ header {
   color: inherit;
 }
 
-.about-contact-item:hover {
-  border-color: var(--primary);
-  background: var(--primary-soft);
-}
+.about-contact-item:hover { border-color: var(--primary); background: var(--primary-soft); }
 
 .about-contact-icon {
   width: 38px;
@@ -801,22 +831,14 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
   flex-shrink: 0;
+  color: var(--primary);
 }
 
-.about-contact-info {
-  min-width: 0;
-  flex: 1;
-}
+.about-contact-icon svg { width: 18px; height: 18px; }
 
-.about-contact-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 2px;
-}
-
+.about-contact-info { min-width: 0; flex: 1; }
+.about-contact-label { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px; }
 .about-contact-value {
   font-size: 13px;
   font-weight: 700;
@@ -826,10 +848,7 @@ header {
   text-align: right;
 }
 
-.about-contact-value.fa {
-  direction: rtl;
-  font-family: var(--font);
-}
+.about-contact-value.fa { direction: rtl; font-family: var(--font); }
 
 .about-ceo-box {
   padding: 16px;
@@ -839,18 +858,8 @@ header {
   margin-bottom: 4px;
 }
 
-.about-ceo-name {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--text);
-  margin-bottom: 4px;
-}
-
-.about-ceo-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--primary);
-}
+.about-ceo-name { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.about-ceo-title { font-size: 12px; font-weight: 600; color: var(--primary); }
 
 .about-footer {
   margin-top: 18px;
@@ -873,7 +882,7 @@ header {
 }
 
 /* ============================================================
-   تب‌ها
+   Tabs
    ============================================================ */
 .tabs {
   display: flex;
@@ -899,7 +908,13 @@ header {
   border-radius: var(--radius-sm);
   transition: all 0.25s;
   touch-action: manipulation;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
+
+.tab-btn svg { width: 16px; height: 16px; }
 
 .tab-btn.active {
   background: linear-gradient(135deg, var(--primary), #8b5cf6);
@@ -912,6 +927,9 @@ header {
 .tab-content.active { display: block; animation: fadeIn 0.3s; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+/* ============================================================
+   فرم
+   ============================================================ */
 .form-group { margin-bottom: 16px; }
 
 .form-group label {
@@ -945,11 +963,7 @@ header {
 
 .form-hint { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-top: 6px; line-height: 1.7; }
 
-.sheets-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-}
+.sheets-actions { display: flex; gap: 10px; margin-top: 12px; }
 
 .sheets-actions button {
   flex: 1;
@@ -963,7 +977,13 @@ header {
   min-height: 50px;
   touch-action: manipulation;
   transition: all 0.25s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
+
+.sheets-actions button svg { width: 16px; height: 16px; }
 
 .download-btn {
   background: linear-gradient(135deg, var(--success), #059669);
@@ -977,6 +997,7 @@ header {
   border: 1px solid var(--card-border) !important;
 }
 
+/* نام رله‌ها */
 .names-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
 @media (min-width: 600px) { .names-grid { grid-template-columns: 1fr 1fr; } }
 
@@ -1001,9 +1022,11 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 19px;
   flex-shrink: 0;
+  color: var(--primary);
 }
+
+.name-item-icon svg { width: 22px; height: 22px; }
 
 .name-item input {
   flex: 1;
@@ -1020,15 +1043,11 @@ header {
 }
 
 .name-item input:focus { border-bottom-color: var(--primary); }
+.name-item-num { font-size: 11px; font-weight: 700; color: var(--text-muted); min-width: 26px; text-align: center; }
 
-.name-item-num {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-muted);
-  min-width: 26px;
-  text-align: center;
-}
-
+/* ============================================================
+   زمان‌بندی
+   ============================================================ */
 .schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
 
 .schedule-count {
@@ -1052,7 +1071,12 @@ header {
   cursor: pointer;
   box-shadow: 0 4px 12px var(--success-glow);
   min-height: 46px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
+
+.add-schedule-btn svg { width: 16px; height: 16px; }
 
 .schedule-list { display: flex; flex-direction: column; gap: 10px; max-height: 55vh; overflow-y: auto; }
 
@@ -1065,9 +1089,11 @@ header {
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 12px;
+  transition: all 0.25s;
 }
 
 .schedule-item.disabled { opacity: 0.5; }
+.schedule-item.auto-off { border-right: 3px solid var(--success); }
 
 .schedule-toggle { position: relative; width: 48px; height: 26px; flex-shrink: 0; }
 .schedule-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
@@ -1097,6 +1123,7 @@ header {
 .schedule-toggle input:checked + .slider::before { transform: translateX(22px); }
 
 .schedule-info { min-width: 0; }
+.schedule-time-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .schedule-time { font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: 1px; line-height: 1.2; }
 .schedule-relay { font-size: 13px; font-weight: 700; color: var(--text); margin-top: 4px; }
 .schedule-days { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
@@ -1120,11 +1147,16 @@ header {
   background: var(--danger-medium);
   color: var(--danger);
   cursor: pointer;
-  font-size: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.schedule-delete svg { width: 16px; height: 16px; }
+
 .empty-schedule { padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 14px; font-weight: 500; }
-.empty-schedule .icon { font-size: 52px; opacity: 0.3; margin-bottom: 12px; }
+.empty-schedule .icon { display: flex; justify-content: center; margin-bottom: 12px; opacity: 0.3; }
+.empty-schedule .icon svg { width: 52px; height: 52px; }
 
 .schedule-form {
   background: var(--primary-soft);
@@ -1174,6 +1206,104 @@ header {
 
 .day-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
+/* ============================================================
+   ردیف مدت زمان اجرا
+   ============================================================ */
+.duration-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 14px;
+  background: var(--success-soft);
+  border: 1px solid var(--success-medium);
+  border-radius: var(--radius-sm);
+  align-items: center;
+}
+
+.duration-row .duration-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.duration-row .duration-label svg { width: 18px; height: 18px; }
+
+.duration-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.duration-input-wrap input {
+  flex: 1;
+  padding: 10px;
+  background: var(--input-bg);
+  border: 1px solid var(--success-medium);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 18px;
+  font-weight: 800;
+  text-align: center;
+  min-height: 46px;
+}
+
+.duration-input-wrap input:focus {
+  outline: none;
+  border-color: var(--success);
+  box-shadow: 0 0 0 3px var(--success-soft);
+}
+
+.duration-input-wrap .unit {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.duration-hint {
+  grid-column: 1 / -1;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  padding-top: 6px;
+  border-top: 1px solid var(--card-border);
+  margin-top: 4px;
+}
+
+.duration-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: var(--success-medium);
+  color: var(--success);
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 800;
+}
+
+.duration-badge svg { width: 11px; height: 11px; }
+
+.off-time-hint {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.off-time-hint svg { width: 11px; height: 11px; }
+
+/* ============================================================
+   Modal Actions
+   ============================================================ */
 .form-actions { display: flex; gap: 8px; margin-top: 14px; }
 .form-actions button {
   flex: 1;
@@ -1184,6 +1314,7 @@ header {
   font-weight: 700;
   font-size: 14px;
   min-height: 48px;
+  cursor: pointer;
 }
 
 .form-actions .save { background: linear-gradient(135deg, var(--primary), #8b5cf6); color: #fff; }
@@ -1202,6 +1333,7 @@ header {
   font-weight: 700;
   font-size: 15px;
   min-height: 50px;
+  cursor: pointer;
 }
 
 .btn-secondary {
@@ -1215,7 +1347,14 @@ header {
   font-weight: 700;
   font-size: 15px;
   min-height: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
+
+.btn-secondary svg { width: 16px; height: 16px; }
 
 /* ============================================================
    Footer
@@ -1240,41 +1379,242 @@ header {
   letter-spacing: 0.5px;
 }
 
-.app-footer .footer-brand:hover {
-  text-decoration: underline;
-}
+.app-footer .footer-brand:hover { text-decoration: underline; }
 
 @media (max-width: 520px) {
   body { padding: 10px; }
   header { padding: 14px; gap: 10px; }
   .header-top { padding-bottom: 12px; gap: 10px; }
-  .logo-icon { width: 46px; height: 46px; font-size: 22px; border-radius: 13px; }
+  .logo-icon { width: 46px; height: 46px; }
+  .logo-icon svg { width: 26px; height: 26px; }
   .logo h1 { font-size: 16px; }
   .logo p { font-size: 11px; }
   .clock { padding: 10px 14px; border-radius: 13px; min-width: 110px; }
   .clock .time { font-size: 24px; }
   .clock .date { font-size: 11px; }
   .status-badge { padding: 8px 14px; font-size: 13px; flex: 1; justify-content: center; }
-  .icon-btn { width: 44px; height: 44px; font-size: 20px; border-radius: 12px; }
+  .icon-btn { width: 44px; height: 44px; }
+  .icon-btn svg { width: 20px; height: 20px; }
   .stat-card { padding: 14px 12px; }
-  .stat-icon { width: 44px; height: 44px; font-size: 20px; }
+  .stat-icon { width: 44px; height: 44px; }
+  .stat-icon svg { width: 24px; height: 24px; }
   .stat-info h3 { font-size: 24px; }
   .stat-info p { font-size: 12px; }
   .section-title { font-size: 17px; }
   .relay-grid { gap: 10px; }
   .relay-card { padding: 14px 10px; }
+  .valve-icon-wrap { height: 66px; }
+  .valve-icon-wrap svg { width: 76px; height: 66px; }
   .relay-number { font-size: 10px; padding: 3px 9px; }
   .relay-name { font-size: 14px; }
-  .relay-state-icon { font-size: 36px; }
   .relay-state-text { font-size: 17px; }
   .btn { font-size: 13px; min-height: 44px; }
   .panel { padding: 14px; }
   .chart-wrapper { height: 180px; }
   .about-company-name { font-size: 18px; }
+  .duration-row { grid-template-columns: 1fr; }
+  .duration-row .duration-label { justify-content: center; }
 }
 </style>
 </head>
 <body>
+
+<!-- ============================================================
+     SVG Sprites (آیکون‌های آماده)
+     ============================================================ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- 💧 شیربرقی کامل -->
+    <symbol id="icon-valve" viewBox="0 0 100 90">
+      <!-- لوله افقی -->
+      <rect class="valve-pipe" x="5" y="52" width="90" height="14" rx="3"/>
+      <!-- فلنج چپ -->
+      <rect class="valve-flange" x="2" y="48" width="10" height="22" rx="2"/>
+      <line class="valve-detail" x1="5" y1="52" x2="5" y2="68" stroke-width="1"/>
+      <!-- فلنج راست -->
+      <rect class="valve-flange" x="88" y="48" width="10" height="22" rx="2"/>
+      <line class="valve-detail" x1="95" y1="52" x2="95" y2="68" stroke-width="1"/>
+      <!-- بدنه شیر (مثلث / ذوزنقه) -->
+      <path class="valve-body" d="M 30 52 L 50 30 L 70 52 Z"/>
+      <!-- بدنه مستطیلی وسط -->
+      <rect class="valve-body" x="28" y="45" width="44" height="14" rx="2"/>
+      <!-- کویل (سلونوئید) -->
+      <rect class="valve-coil" x="40" y="10" width="20" height="22" rx="2"/>
+      <!-- خطوط کویل -->
+      <line class="valve-detail" x1="40" y1="15" x2="60" y2="15" stroke-width="1" opacity="0.5"/>
+      <line class="valve-detail" x1="40" y1="19" x2="60" y2="19" stroke-width="1" opacity="0.5"/>
+      <line class="valve-detail" x1="40" y1="23" x2="60" y2="23" stroke-width="1" opacity="0.5"/>
+      <line class="valve-detail" x1="40" y1="27" x2="60" y2="27" stroke-width="1" opacity="0.5"/>
+      <!-- سیم‌های کویل -->
+      <path class="valve-wire" d="M 42 10 Q 42 4 36 4 L 30 4" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <path class="valve-wire" d="M 58 10 Q 58 4 64 4 L 70 4" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <circle cx="30" cy="4" r="2" fill="#ef4444"/>
+      <circle cx="70" cy="4" r="2" fill="#1e293b"/>
+      <!-- جریان آب -->
+      <path d="M 10 59 L 20 59 M 80 59 L 90 59" stroke="#38bdf8" stroke-width="2" fill="none" opacity="0.7" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- ⚡ برق / کنترل -->
+    <symbol id="icon-bolt" viewBox="0 0 24 24">
+      <path d="M13 2L4.09 12.97a1 1 0 0 0 .76 1.66h6.15l-1 6.37a1 1 0 0 0 1.79.76L20.91 11a1 1 0 0 0-.76-1.66h-6.15l1-6.37A1 1 0 0 0 13 2z" fill="currentColor"/>
+    </symbol>
+
+    <!-- 💡 روشن -->
+    <symbol id="icon-bulb-on" viewBox="0 0 24 24" fill="none">
+      <path d="M9 21h6M10 18h4M12 3a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V18h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- 🔌 خاموش -->
+    <symbol id="icon-bulb-off" viewBox="0 0 24 24" fill="none">
+      <path d="M9 21h6M10 18h4M8.5 8.5A5 5 0 0 0 12 17v1h3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M4 4l16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 🔄 sync -->
+    <symbol id="icon-sync" viewBox="0 0 24 24" fill="none">
+      <path d="M21 12a9 9 0 0 1-15 6.7L3 16M3 12a9 9 0 0 1 15-6.7L21 8M3 8v4h4M21 16v-4h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- ⏰ زمان‌بندی -->
+    <symbol id="icon-clock" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+      <path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- ⏱️ تایمر / مدت زمان -->
+    <symbol id="icon-timer" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="13" r="8" stroke="currentColor" stroke-width="2"/>
+      <path d="M12 9v4l2 2M9 2h6M12 2v3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- ⚙️ تنظیمات -->
+    <symbol id="icon-settings" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+      <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" stroke="currentColor" stroke-width="1.5"/>
+    </symbol>
+
+    <!-- ☀️ تم روشن -->
+    <symbol id="icon-sun" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/>
+      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 🌙 تم تاریک -->
+    <symbol id="icon-moon" viewBox="0 0 24 24" fill="none">
+      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- ✕ بستن -->
+    <symbol id="icon-close" viewBox="0 0 24 24" fill="none">
+      <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 🗑️ حذف -->
+    <symbol id="icon-trash" viewBox="0 0 24 24" fill="none">
+      <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- ➕ افزودن -->
+    <symbol id="icon-plus" viewBox="0 0 24 24" fill="none">
+      <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 📥 دانلود -->
+    <symbol id="icon-download" viewBox="0 0 24 24" fill="none">
+      <path d="M12 3v12m0 0l-4-4m4 4l4-4M3 17v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- 🌐 باز کردن -->
+    <symbol id="icon-external" viewBox="0 0 24 24" fill="none">
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M21 3l-9 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- 🔍 جستجو / تست -->
+    <symbol id="icon-search" viewBox="0 0 24 24" fill="none">
+      <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+      <path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 🏷️ نام‌ها -->
+    <symbol id="icon-tag" viewBox="0 0 24 24" fill="none">
+      <path d="M20.6 13.4 12 22 2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8zM7 7h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- 📊 Sheets -->
+    <symbol id="icon-chart" viewBox="0 0 24 24" fill="none">
+      <path d="M3 3v18h18M7 14l4-4 4 4 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- 🔌 MQTT -->
+    <symbol id="icon-plugin" viewBox="0 0 24 24" fill="none">
+      <path d="M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-6 6 6 6 0 0 1-6-6V8zM12 18v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- ℹ️ اطلاعات -->
+    <symbol id="icon-info" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+      <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 🏢 شرکت -->
+    <symbol id="icon-building" viewBox="0 0 24 24" fill="none">
+      <path d="M3 21h18M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M15 21V9h4a2 2 0 0 1 2 2v10M9 7h2M9 11h2M9 15h2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- 🎯 هدف -->
+    <symbol id="icon-target" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+      <circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2"/>
+      <circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="2"/>
+    </symbol>
+
+    <!-- 👤 کاربر -->
+    <symbol id="icon-user" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+      <path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 📧 ایمیل -->
+    <symbol id="icon-mail" viewBox="0 0 24 24" fill="none">
+      <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
+      <path d="m22 7-10 7L2 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- 📱 تلفن -->
+    <symbol id="icon-phone" viewBox="0 0 24 24" fill="none">
+      <rect x="6" y="2" width="12" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+      <path d="M11 18h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- ✅ موفقیت -->
+    <symbol id="icon-check" viewBox="0 0 24 24" fill="none">
+      <path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- ❌ خطا -->
+    <symbol id="icon-x-circle" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+      <path d="M15 9l-6 6M9 9l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- ⚡ برق شرکت -->
+    <symbol id="icon-company" viewBox="0 0 24 24" fill="none">
+      <path d="M13 2L4.09 12.97a1 1 0 0 0 .76 1.66h6.15l-1 6.37a1 1 0 0 0 1.79.76L20.91 11a1 1 0 0 0-.76-1.66h-6.15l1-6.37A1 1 0 0 0 13 2z" fill="currentColor"/>
+    </symbol>
+
+    <!-- تنظیمات valve کوچک (برای لیست نام‌ها) -->
+    <symbol id="icon-valve-mini" viewBox="0 0 100 90">
+      <rect class="valve-pipe" x="5" y="52" width="90" height="14" rx="3"/>
+      <rect class="valve-flange" x="2" y="48" width="10" height="22" rx="2"/>
+      <rect class="valve-flange" x="88" y="48" width="10" height="22" rx="2"/>
+      <path class="valve-body" d="M 30 52 L 50 30 L 70 52 Z"/>
+      <rect class="valve-body" x="28" y="45" width="44" height="14" rx="2"/>
+      <rect class="valve-coil" x="40" y="10" width="20" height="22" rx="2"/>
+      <path class="valve-wire" d="M 42 10 Q 42 4 36 4 L 30 4" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <path class="valve-wire" d="M 58 10 Q 58 4 64 4 L 70 4" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
 
 <div class="toast-container" id="toastContainer"></div>
 
@@ -1284,18 +1624,19 @@ header {
 <div class="modal-overlay" id="aboutModal" onclick="handleAboutOverlayClick(event)">
   <div class="modal about-modal" onclick="event.stopPropagation()">
     <div class="modal-title">
-      <span>🏢 درباره شرکت</span>
-      <button class="close-btn" onclick="closeAbout()">✕</button>
+      <span style="display:flex;align-items:center;">
+        <svg class="title-icon"><use href="#icon-building"/></svg>
+        درباره شرکت
+      </span>
+      <button class="close-btn" onclick="closeAbout()">
+        <svg><use href="#icon-close"/></svg>
+      </button>
     </div>
 
-    <!-- لوگو -->
-    <svg class="about-logo" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-      <!-- کادر خارجی -->
+    <svg class="about-logo" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg">
       <rect x="20" y="15" width="360" height="85" rx="8" fill="#000000"/>
       <rect x="25" y="20" width="350" height="60" rx="5" fill="#ffffff"/>
-      <!-- TAK -->
       <text x="200" y="68" font-family="Inter, Arial, sans-serif" font-size="52" font-weight="900" fill="#000000" text-anchor="middle" letter-spacing="4">TAK</text>
-      <!-- نوار پایین -->
       <rect x="25" y="82" width="350" height="18" fill="#000000"/>
       <text x="200" y="95" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="3">Industrial Group</text>
     </svg>
@@ -1305,7 +1646,10 @@ header {
 
     <div class="about-divider"></div>
 
-    <div class="about-section-title">🎯 حوزه فعالیت</div>
+    <div class="about-section-title">
+      <svg><use href="#icon-target"/></svg>
+      حوزه فعالیت
+    </div>
     <div class="about-text">
       گروه صنعتی <b>تکساز آزما کومش</b>، پیشرو در طراحی و پیاده‌سازی راهکارهای
       <b>هوشمندسازی صنعتی</b> و <b>Digital Twin</b> است. با تکیه بر دانش بومی و
@@ -1314,33 +1658,24 @@ header {
 
     <div class="about-divider"></div>
 
-    <div class="about-section-title">⚙️ خدمات ما</div>
+    <div class="about-section-title">
+      <svg><use href="#icon-settings"/></svg>
+      خدمات ما
+    </div>
     <div class="about-services">
-      <div class="about-service-item">
-        <span class="emoji">🔧</span>
-        <span>طراحی سامانه‌های کنترل هوشمند</span>
-      </div>
-      <div class="about-service-item">
-        <span class="emoji">🌐</span>
-        <span>پیاده‌سازی Digital Twin برای خطوط تولید</span>
-      </div>
-      <div class="about-service-item">
-        <span class="emoji">📊</span>
-        <span>مانیتورینگ بلادرنگ و تحلیل داده صنعتی</span>
-      </div>
-      <div class="about-service-item">
-        <span class="emoji">🤖</span>
-        <span>اتوماسیون صنعتی به سفارش مشتری</span>
-      </div>
-      <div class="about-service-item">
-        <span class="emoji">📡</span>
-        <span>یکپارچه‌سازی IoT و IIoT در محیط صنعتی</span>
-      </div>
+      <div class="about-service-item"><svg><use href="#icon-bolt"/></svg><span>طراحی سامانه‌های کنترل هوشمند</span></div>
+      <div class="about-service-item"><svg><use href="#icon-target"/></svg><span>پیاده‌سازی Digital Twin برای خطوط تولید</span></div>
+      <div class="about-service-item"><svg><use href="#icon-chart"/></svg><span>مانیتورینگ بلادرنگ و تحلیل داده صنعتی</span></div>
+      <div class="about-service-item"><svg><use href="#icon-sync"/></svg><span>اتوماسیون صنعتی به سفارش مشتری</span></div>
+      <div class="about-service-item"><svg><use href="#icon-plugin"/></svg><span>یکپارچه‌سازی IoT و IIoT در محیط صنعتی</span></div>
     </div>
 
     <div class="about-divider"></div>
 
-    <div class="about-section-title">👤 مدیرعامل</div>
+    <div class="about-section-title">
+      <svg><use href="#icon-user"/></svg>
+      مدیرعامل
+    </div>
     <div class="about-ceo-box">
       <div class="about-ceo-name">دکتر مداح</div>
       <div class="about-ceo-title">مدیرعامل گروه صنعتی تکساز آزما کومش</div>
@@ -1348,17 +1683,20 @@ header {
 
     <div class="about-divider"></div>
 
-    <div class="about-section-title">📞 راه‌های ارتباطی</div>
+    <div class="about-section-title">
+      <svg><use href="#icon-mail"/></svg>
+      راه‌های ارتباطی
+    </div>
     <div class="about-contact-grid">
       <a class="about-contact-item" href="mailto:taksazazmakoomesh@gmail.com">
-        <div class="about-contact-icon">📧</div>
+        <div class="about-contact-icon"><svg><use href="#icon-mail"/></svg></div>
         <div class="about-contact-info">
           <div class="about-contact-label">ایمیل پشتیبانی</div>
           <div class="about-contact-value">taksazazmakoomesh@gmail.com</div>
         </div>
       </a>
       <a class="about-contact-item" href="tel:09122316905">
-        <div class="about-contact-icon">📱</div>
+        <div class="about-contact-icon"><svg><use href="#icon-phone"/></svg></div>
         <div class="about-contact-info">
           <div class="about-contact-label">تماس مستقیم با مدیرعامل</div>
           <div class="about-contact-value fa">۰۹۱۲۲۳۱۶۹۰۵</div>
@@ -1379,20 +1717,33 @@ header {
 <div class="modal-overlay" id="settingsModal">
   <div class="modal wide">
     <div class="modal-title">
-      <span>⚙️ تنظیمات</span>
-      <button class="close-btn" onclick="closeSettings()">✕</button>
+      <span style="display:flex;align-items:center;">
+        <svg class="title-icon"><use href="#icon-settings"/></svg>
+        تنظیمات
+      </span>
+      <button class="close-btn" onclick="closeSettings()">
+        <svg><use href="#icon-close"/></svg>
+      </button>
     </div>
 
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab(event, 'tab-names')">🏷️ نام‌ها</button>
-      <button class="tab-btn" onclick="switchTab(event, 'tab-schedule')">⏰ زمان‌بندی</button>
-      <button class="tab-btn" onclick="switchTab(event, 'tab-mqtt')">🔌 MQTT</button>
-      <button class="tab-btn" onclick="switchTab(event, 'tab-sheets')">📊 Google Sheets</button>
+      <button class="tab-btn active" onclick="switchTab(event, 'tab-names')">
+        <svg><use href="#icon-tag"/></svg> نام‌ها
+      </button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-schedule')">
+        <svg><use href="#icon-clock"/></svg> زمان‌بندی
+      </button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-mqtt')">
+        <svg><use href="#icon-plugin"/></svg> MQTT
+      </button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-sheets')">
+        <svg><use href="#icon-chart"/></svg> Google Sheets
+      </button>
     </div>
 
     <div class="tab-content active" id="tab-names">
       <div class="form-hint" style="margin-bottom: 14px; text-align: center;">
-        نام دلخواه برای هر کانال رله
+        نام دلخواه برای هر شیربرقی / کانال رله
       </div>
       <div class="names-grid" id="namesGrid"></div>
     </div>
@@ -1400,7 +1751,9 @@ header {
     <div class="tab-content" id="tab-schedule">
       <div class="schedule-header">
         <span class="schedule-count" id="scheduleCount">۰ زمان‌بندی</span>
-        <button class="add-schedule-btn" onclick="showAddSchedule()">➕ افزودن</button>
+        <button class="add-schedule-btn" onclick="showAddSchedule()">
+          <svg><use href="#icon-plus"/></svg> افزودن
+        </button>
       </div>
       <div id="scheduleFormContainer"></div>
       <div class="schedule-list" id="scheduleList"></div>
@@ -1425,12 +1778,6 @@ header {
       <div class="form-group">
         <label>📊 Google Sheet ID</label>
         <input type="text" id="inputSheetId" class="ltr" placeholder="1AbC..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-        <div class="form-hint">
-          از URL شیت کپی کنید:<br>
-          <code style="background:var(--card-bg-inner);padding:3px 6px;border-radius:4px;font-size:11px;direction:ltr;display:inline-block;margin-top:4px;">
-            docs.google.com/spreadsheets/d/<b>THIS</b>/edit
-          </code>
-        </div>
       </div>
 
       <div class="form-group">
@@ -1441,19 +1788,27 @@ header {
       <div class="form-group">
         <label>📥 دانلود داده‌ها</label>
         <div class="sheets-actions">
-          <button class="download-btn" onclick="downloadSheet()">📥 دانلود Excel</button>
-          <button class="open-sheet-btn" onclick="openSheetInBrowser()">🌐 باز کردن</button>
+          <button class="download-btn" onclick="downloadSheet()">
+            <svg><use href="#icon-download"/></svg> دانلود Excel
+          </button>
+          <button class="open-sheet-btn" onclick="openSheetInBrowser()">
+            <svg><use href="#icon-external"/></svg> باز کردن
+          </button>
         </div>
       </div>
 
       <div class="form-group">
         <label>🧪 تست اتصال</label>
-        <button class="btn-secondary" onclick="testSheetsConnection()" style="width:100%;">🔍 بررسی اتصال</button>
+        <button class="btn-secondary" onclick="testSheetsConnection()" style="width:100%;">
+          <svg><use href="#icon-search"/></svg> بررسی اتصال
+        </button>
       </div>
     </div>
 
     <div class="modal-actions">
-      <button class="btn-secondary" onclick="resetSettings()">🔄 بازنشانی</button>
+      <button class="btn-secondary" onclick="resetSettings()">
+        <svg><use href="#icon-sync"/></svg> بازنشانی
+      </button>
       <button class="btn-primary" onclick="saveSettings()">💾 ذخیره</button>
     </div>
   </div>
@@ -1464,7 +1819,7 @@ header {
      ============================================================ -->
 <div class="container">
 
-  <!-- 📛 نوار لوگو TAK -->
+  <!-- نوار لوگو TAK -->
   <div class="top-brand-bar" onclick="openAbout()" title="درباره شرکت">
     <svg class="brand-logo-svg" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg">
       <rect x="20" y="15" width="360" height="85" rx="8" fill="#000000"/>
@@ -1474,7 +1829,7 @@ header {
       <text x="200" y="95" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="3">Industrial Group</text>
     </svg>
     <div class="brand-info-icon">
-      <span>ℹ️</span>
+      <svg width="16" height="16"><use href="#icon-info"/></svg>
       <span class="brand-hint">درباره ما</span>
     </div>
   </div>
@@ -1482,10 +1837,12 @@ header {
   <header>
     <div class="header-top">
       <div class="logo">
-        <div class="logo-icon">⚡</div>
+        <div class="logo-icon">
+          <svg><use href="#icon-valve"/></svg>
+        </div>
         <div>
           <h1>کنترلر هوشمند گلخانه</h1>
-          <p>۸ کانال · Real-time</p>
+          <p>۸ شیربرقی · Real-time</p>
         </div>
       </div>
       <div class="clock">
@@ -1500,33 +1857,45 @@ header {
         <span id="statusText">اتصال...</span>
       </div>
       <div class="icon-group">
-        <button class="icon-btn" onclick="openSchedulesQuick()" title="زمان‌بندی">⏰</button>
-        <button class="icon-btn" id="themeToggle" title="تم">☀️</button>
-        <button class="icon-btn" onclick="openSettings()" title="تنظیمات">⚙️</button>
+        <button class="icon-btn" onclick="openSchedulesQuick()" title="زمان‌بندی">
+          <svg><use href="#icon-clock"/></svg>
+        </button>
+        <button class="icon-btn" id="themeToggle" title="تم"></button>
+        <button class="icon-btn" onclick="openSettings()" title="تنظیمات">
+          <svg><use href="#icon-settings"/></svg>
+        </button>
       </div>
     </div>
   </header>
 
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="stat-icon green">💡</div>
-      <div class="stat-info"><h3 id="statOn">0</h3><p>رله روشن</p></div>
+      <div class="stat-icon green">
+        <svg><use href="#icon-valve"/></svg>
+      </div>
+      <div class="stat-info"><h3 id="statOn">0</h3><p>شیربرقی باز</p></div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon red">🔌</div>
-      <div class="stat-info"><h3 id="statOff">8</h3><p>رله خاموش</p></div>
+      <div class="stat-icon red">
+        <svg><use href="#icon-valve"/></svg>
+      </div>
+      <div class="stat-info"><h3 id="statOff">8</h3><p>شیربرقی بسته</p></div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon blue">🔄</div>
+      <div class="stat-icon blue">
+        <svg><use href="#icon-sync"/></svg>
+      </div>
       <div class="stat-info"><h3 id="statToggles">0</h3><p>کل تغییرات</p></div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon yellow">⏰</div>
+      <div class="stat-icon yellow">
+        <svg><use href="#icon-clock"/></svg>
+      </div>
       <div class="stat-info"><h3 id="statSchedules">0</h3><p>زمان‌بندی فعال</p></div>
     </div>
   </div>
 
-  <div class="section-title">کنترل رله‌ها</div>
+  <div class="section-title">کنترل شیربرقی‌ها</div>
   <div class="relay-grid" id="relayGrid"></div>
 
   <div class="bottom-grid">
@@ -1554,7 +1923,7 @@ header {
 
 <script>
 /* ============================================================
-   🧹 پاکسازی اولیه
+   پاکسازی اولیه
    ============================================================ */
 document.body.classList.remove("modal-open");
 document.body.style.position = "";
@@ -1601,8 +1970,8 @@ const DEFAULT_CONFIG = {
 };
 
 const DEFAULT_NAMES = [
-  "کانال ۱", "کانال ۲", "کانال ۳", "کانال ۴",
-  "کانال ۵", "کانال ۶", "کانال ۷", "کانال ۸"
+  "شیربرقی ۱", "شیربرقی ۲", "شیربرقی ۳", "شیربرقی ۴",
+  "شیربرقی ۵", "شیربرقی ۶", "شیربرقی ۷", "شیربرقی ۸"
 ];
 
 function getConfig() {
@@ -1641,7 +2010,6 @@ const state = {
 
 const DAY_LABELS = ["ش", "ی", "د", "س", "چ", "پ", "ج"];
 const DAY_NAMES  = ["شنبه", "یک‌شنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"];
-const relayIcons = ["💡", "🔆", "🌡️", "❄️", "🌀", "🔔", "🎛️", "⚙️"];
 
 /* ============================================================
    ساعت
@@ -1663,15 +2031,46 @@ updateClock();
    ============================================================ */
 const themeToggle = document.getElementById("themeToggle");
 const savedTheme = localStorage.getItem("theme") || "light";
-document.documentElement.setAttribute("data-theme", savedTheme);
-themeToggle.textContent = savedTheme === "dark" ? "🌙" : "☀️";
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  if (theme === "dark") {
+    themeToggle.innerHTML = '<svg><use href="#icon-moon"/></svg>';
+  } else {
+    themeToggle.innerHTML = '<svg><use href="#icon-sun"/></svg>';
+  }
+}
+
+applyTheme(savedTheme);
 
 themeToggle.addEventListener("click", () => {
   const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
-  document.documentElement.setAttribute("data-theme", next);
-  themeToggle.textContent = next === "dark" ? "🌙" : "☀️";
+  applyTheme(next);
   localStorage.setItem("theme", next);
 });
+
+/* ============================================================
+   SVG های شیربرقی (تکرار می‌شود در کارت‌ها)
+   ============================================================ */
+const VALVE_SVG = `<svg viewBox="0 0 100 90" xmlns="http://www.w3.org/2000/svg">
+  <rect class="valve-pipe" x="5" y="52" width="90" height="14" rx="3"/>
+  <rect class="valve-flange" x="2" y="48" width="10" height="22" rx="2"/>
+  <line class="valve-detail" x1="5" y1="52" x2="5" y2="68" stroke-width="1"/>
+  <rect class="valve-flange" x="88" y="48" width="10" height="22" rx="2"/>
+  <line class="valve-detail" x1="95" y1="52" x2="95" y2="68" stroke-width="1"/>
+  <path class="valve-body" d="M 30 52 L 50 30 L 70 52 Z"/>
+  <rect class="valve-body" x="28" y="45" width="44" height="14" rx="2"/>
+  <rect class="valve-coil" x="40" y="10" width="20" height="22" rx="2"/>
+  <line class="valve-detail" x1="40" y1="15" x2="60" y2="15" stroke-width="1" opacity="0.5"/>
+  <line class="valve-detail" x1="40" y1="19" x2="60" y2="19" stroke-width="1" opacity="0.5"/>
+  <line class="valve-detail" x1="40" y1="23" x2="60" y2="23" stroke-width="1" opacity="0.5"/>
+  <line class="valve-detail" x1="40" y1="27" x2="60" y2="27" stroke-width="1" opacity="0.5"/>
+  <path class="valve-wire" d="M 42 10 Q 42 4 36 4 L 30 4" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path class="valve-wire" d="M 58 10 Q 58 4 64 4 L 70 4" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <circle cx="30" cy="4" r="2" fill="#ef4444"/>
+  <circle cx="70" cy="4" r="2" fill="#1e293b"/>
+  <path d="M 10 59 L 20 59 M 80 59 L 90 59" stroke="#38bdf8" stroke-width="2" fill="none" opacity="0.7" stroke-linecap="round"/>
+</svg>`;
 
 /* ============================================================
    کارت‌های رله
@@ -1685,17 +2084,17 @@ function renderCards() {
     card.className = "relay-card";
     card.id = `relay-${i}`;
     card.innerHTML = `
-      <span class="relay-number">کانال ${i + 1}</span>
+      <span class="relay-number">شیربرقی ${i + 1}</span>
       <div class="relay-name" id="name-${i}">${relayNames[i]}</div>
-      <div class="relay-state-icon">${relayIcons[i]}</div>
-      <div class="relay-state-text" id="state-${i}">خاموش</div>
+      <div class="valve-icon-wrap">${VALVE_SVG}</div>
+      <div class="relay-state-text" id="state-${i}">بسته</div>
       <div class="relay-time" id="time-${i}">--</div>
       <div class="sparkline-wrap">
         <canvas class="sparkline-canvas" id="spark-${i}"></canvas>
       </div>
       <div class="relay-actions">
-        <button class="btn btn-on" onclick="sendCommand(${i + 1}, 'ON')">روشن</button>
-        <button class="btn btn-off" onclick="sendCommand(${i + 1}, 'OFF')">خاموش</button>
+        <button class="btn btn-on" onclick="sendCommand(${i + 1}, 'ON')">باز کردن</button>
+        <button class="btn btn-off" onclick="sendCommand(${i + 1}, 'OFF')">بستن</button>
       </div>
     `;
     relayGrid.appendChild(card);
@@ -1807,10 +2206,14 @@ const activityChart = new Chart(
    Toast
    ============================================================ */
 function showToast(message, type = "info") {
-  const icons = { success: "✅", error: "❌", info: "ℹ️" };
+  const iconMap = {
+    success: "icon-check",
+    error: "icon-x-circle",
+    info: "icon-info"
+  };
   const toast = document.createElement("div");
   toast.className = `toast ${type}`;
-  toast.innerHTML = `<span style="font-size:18px;">${icons[type]}</span><span>${message}</span>`;
+  toast.innerHTML = `<svg><use href="#${iconMap[type]}"/></svg><span>${message}</span>`;
   document.getElementById("toastContainer").appendChild(toast);
   setTimeout(() => {
     toast.classList.add("hide");
@@ -1888,7 +2291,7 @@ function connectMQTT() {
         const data = JSON.parse(payload.toString());
         if (data && Array.isArray(data.names)) {
           const n = data.names.slice(0, 8);
-          while (n.length < 8) n.push(`کانال ${n.length + 1}`);
+          while (n.length < 8) n.push(`شیربرقی ${n.length + 1}`);
           updateAllNames(n);
         }
         return;
@@ -1897,7 +2300,42 @@ function connectMQTT() {
       if (topic === CONFIG.TOPIC_SCHEDULE) {
         const data = JSON.parse(payload.toString());
         if (data && Array.isArray(data.schedules)) {
-          schedules = data.schedules;
+          // حفظ groupId و duration از نسخه محلی
+          const newSchedules = data.schedules.map(ns => {
+            const existing = schedules.find(s => s.id === ns.id);
+            if (existing && existing.groupId) {
+              ns.groupId = existing.groupId;
+              ns.duration = existing.duration;
+              ns.offHour = existing.offHour;
+              ns.offMin = existing.offMin;
+              ns.isAutoOff = existing.isAutoOff;
+            }
+            return ns;
+          });
+          schedules = newSchedules;
+
+          // بازسازی خودکار زمان‌بندی‌های خاموشی
+          const restored = [...schedules];
+          schedules.forEach(s => {
+            if (s.groupId && s.duration && s.action === "ON" && !s.isAutoOff) {
+              const hasAutoOff = schedules.some(x => x.groupId === s.groupId && x.isAutoOff);
+              if (!hasAutoOff && s.offHour !== undefined) {
+                restored.push({
+                  id: s.id + 10000,
+                  hour: s.offHour,
+                  minute: s.offMin,
+                  relay: s.relay,
+                  action: "OFF",
+                  days: s.days,
+                  enabled: s.enabled,
+                  groupId: s.groupId,
+                  isAutoOff: true
+                });
+              }
+            }
+          });
+          schedules = restored;
+
           renderScheduleList();
           updateSchedulesStats();
         }
@@ -1936,7 +2374,7 @@ function connectMQTT() {
 
         if (data.source !== "boot" && data.source !== "sync") {
           showToast(
-            `${relayNames[idx]} ${isOn ? "روشن" : "خاموش"} شد`,
+            `${relayNames[idx]} ${isOn ? "باز شد" : "بسته شد"}`,
             isOn ? "success" : "error"
           );
         }
@@ -1969,7 +2407,7 @@ function updateCard(index) {
   if (!card) return;
   const isOn = state.relays[index];
   card.classList.toggle("on", isOn);
-  stateEl.textContent = isOn ? "روشن" : "خاموش";
+  stateEl.textContent = isOn ? "باز" : "بسته";
   timeEl.textContent = formatPersianDateTime(state.timestamps[index]);
 }
 
@@ -1981,10 +2419,11 @@ function updateStats() {
 }
 
 function updateSchedulesStats() {
-  const active = schedules.filter(s => s.enabled).length;
+  const visible = schedules.filter(s => !s.isAutoOff);
+  const active = visible.filter(s => s.enabled).length;
   document.getElementById("statSchedules").textContent = active;
   document.getElementById("scheduleCount").textContent =
-    `${schedules.length} زمان‌بندی (${active} فعال)`;
+    `${visible.length} زمان‌بندی (${active} فعال)`;
 }
 
 /* ============================================================
@@ -2002,26 +2441,30 @@ function addLog(relayNum, stateVal, timestamp, source) {
 
   const sourceLabel = {
     "MQTT": "دستی",
-    "SCHEDULE": "⏰",
+    "SCHEDULE": "زمان‌بند",
     "boot": "بوت",
     "sync": "همگام",
     "TEST": "تست"
   }[source] || source;
 
+  const iconId = isOn ? "icon-valve" : "icon-valve";
+
   const entry = document.createElement("div");
   entry.className = `log-entry ${isOn ? "on" : "off"}`;
   entry.innerHTML = `
-    <span class="log-icon">${isOn ? "🟢" : "🔴"}</span>
+    <div class="log-icon" style="color: ${isOn ? "var(--success)" : "var(--danger)"};">
+      <svg><use href="#${iconId}"/></svg>
+    </div>
     <div class="log-content">
       <div class="log-row-1">
         <span class="log-relay">${relayNames[relayNum - 1]}</span>
         <span class="log-state" style="color:${isOn ? "var(--success)" : "var(--danger)"};">
-          ${isOn ? "روشن" : "خاموش"}
+          ${isOn ? "باز" : "بسته"}
           <small style="opacity:0.6; font-size:11px;">(${sourceLabel})</small>
         </span>
       </div>
       <div class="log-row-2">
-        <span class="log-time">🕒 ${persianTime}</span>
+        <span class="log-time">${persianTime}</span>
       </div>
     </div>
   `;
@@ -2030,21 +2473,27 @@ function addLog(relayNum, stateVal, timestamp, source) {
 }
 
 /* ============================================================
-   زمان‌بندی
+   زمان‌بندی — لیست
    ============================================================ */
 function renderScheduleList() {
   const list = document.getElementById("scheduleList");
-  if (!schedules.length) {
+  const visibleSchedules = schedules.filter(s => !s.isAutoOff);
+
+  if (!visibleSchedules.length) {
     list.innerHTML = `
       <div class="empty-schedule">
-        <div class="icon">⏰</div>
+        <div class="icon">
+          <svg><use href="#icon-clock"/></svg>
+        </div>
         <div>هیچ زمان‌بندی‌ای تنظیم نشده</div>
       </div>
     `;
     return;
   }
 
-  const sorted = [...schedules].sort((a, b) => (a.hour * 60 + a.minute) - (b.hour * 60 + b.minute));
+  const sorted = [...visibleSchedules].sort(
+    (a, b) => (a.hour * 60 + a.minute) - (b.hour * 60 + b.minute)
+  );
 
   list.innerHTML = "";
   sorted.forEach(s => {
@@ -2054,19 +2503,34 @@ function renderScheduleList() {
       return `<span class="day-chip ${active ? "active" : ""}">${lbl}</span>`;
     }).join("");
 
+    const hasDuration = s.duration && s.duration > 0;
+    const durationBadge = hasDuration
+      ? `<span class="duration-badge"><svg><use href="#icon-timer"/></svg>${s.duration} دقیقه</span>`
+      : "";
+
+    const offTime = hasDuration
+      ? `<div class="off-time-hint"><svg><use href="#icon-timer"/></svg>خاموشی خودکار در ${String(s.offHour).padStart(2, "0")}:${String(s.offMin).padStart(2, "0")}</div>`
+      : "";
+
     const item = document.createElement("div");
-    item.className = `schedule-item ${s.enabled ? "" : "disabled"}`;
+    item.className = `schedule-item ${s.enabled ? "" : "disabled"} ${hasDuration ? "auto-off" : ""}`;
     item.innerHTML = `
       <label class="schedule-toggle">
         <input type="checkbox" ${s.enabled ? "checked" : ""} onchange="toggleSchedule(${s.id}, this.checked)">
         <span class="slider"></span>
       </label>
       <div class="schedule-info">
-        <div class="schedule-time">${String(s.hour).padStart(2, "0")}:${String(s.minute).padStart(2, "0")}</div>
-        <div class="schedule-relay">${relayIcons[s.relay - 1]} ${relayNames[s.relay - 1]}</div>
+        <div class="schedule-time-row">
+          <div class="schedule-time">${String(s.hour).padStart(2, "0")}:${String(s.minute).padStart(2, "0")}</div>
+          ${durationBadge}
+        </div>
+        <div class="schedule-relay">${relayNames[s.relay - 1]}</div>
+        ${offTime}
         <div class="schedule-days">${daysHtml}</div>
       </div>
-      <button class="schedule-delete" onclick="deleteSchedule(${s.id})">🗑️</button>
+      <button class="schedule-delete" onclick="deleteSchedule(${s.id})">
+        <svg><use href="#icon-trash"/></svg>
+      </button>
     `;
     list.appendChild(item);
   });
@@ -2085,6 +2549,7 @@ function renderScheduleForm(existing = null) {
   const defaultMin  = existing ? existing.minute : Math.ceil(now.getMinutes() / 5) * 5 % 60;
   const defaultRelay = existing ? existing.relay : 1;
   const defaultAction = existing ? existing.action : "ON";
+  const defaultDuration = existing && existing.duration ? existing.duration : 0;
 
   const daysHtml = DAY_LABELS.map((lbl, i) => {
     const active = selectedDays.includes(i);
@@ -2099,17 +2564,17 @@ function renderScheduleForm(existing = null) {
         <div><label class="form-label-sm">ساعت</label><input type="number" id="schedHour" class="form-input-sm time" min="0" max="23" value="${defaultHour}" inputmode="numeric"></div>
         <div><label class="form-label-sm">دقیقه</label><input type="number" id="schedMin" class="form-input-sm time" min="0" max="59" value="${String(defaultMin).padStart(2, "0")}" inputmode="numeric"></div>
         <div><label class="form-label-sm">عملکرد</label>
-          <select id="schedAction" class="form-input-sm">
-            <option value="ON" ${defaultAction === "ON" ? "selected" : ""}>💡 روشن</option>
-            <option value="OFF" ${defaultAction === "OFF" ? "selected" : ""}>🔴 خاموش</option>
+          <select id="schedAction" class="form-input-sm" onchange="toggleDurationField()">
+            <option value="ON" ${defaultAction === "ON" ? "selected" : ""}>باز کردن</option>
+            <option value="OFF" ${defaultAction === "OFF" ? "selected" : ""}>بستن</option>
           </select>
         </div>
       </div>
 
       <div class="form-row form-row-2">
-        <div><label class="form-label-sm">رله</label>
+        <div><label class="form-label-sm">شیربرقی</label>
           <select id="schedRelay" class="form-input-sm">
-            ${relayNames.map((n, i) => `<option value="${i + 1}" ${defaultRelay === i + 1 ? "selected" : ""}>${relayIcons[i]} ${n}</option>`).join("")}
+            ${relayNames.map((n, i) => `<option value="${i + 1}" ${defaultRelay === i + 1 ? "selected" : ""}>${n}</option>`).join("")}
           </select>
         </div>
         <div><label class="form-label-sm">وضعیت</label>
@@ -2117,6 +2582,21 @@ function renderScheduleForm(existing = null) {
             <option value="1" ${(!existing || existing.enabled) ? "selected" : ""}>✅ فعال</option>
             <option value="0" ${(existing && !existing.enabled) ? "selected" : ""}>⏸ غیرفعال</option>
           </select>
+        </div>
+      </div>
+
+      <!-- 🔥 فیلد مدت زمان اجرا -->
+      <div class="duration-row" id="durationRow" style="display: ${defaultAction === "ON" ? "grid" : "none"};">
+        <div class="duration-label">
+          <svg><use href="#icon-timer"/></svg>
+          <span>مدت اجرا</span>
+        </div>
+        <div class="duration-input-wrap">
+          <input type="number" id="schedDuration" min="0" max="1440" value="${defaultDuration}" placeholder="0" inputmode="numeric">
+          <span class="unit">دقیقه</span>
+        </div>
+        <div class="duration-hint">
+          💡 اگر عدد <b>۰</b> باشد، شیربرقی بدون بسته شدن خودکار باز می‌ماند. اگر مثلاً <b>۱۰</b> بنویسید، ۱۰ دقیقه بعد از باز شدن، خودکار بسته می‌شود.
         </div>
       </div>
 
@@ -2133,11 +2613,21 @@ function renderScheduleForm(existing = null) {
   `;
 }
 
+function toggleDurationField() {
+  const action = document.getElementById("schedAction").value;
+  const durationRow = document.getElementById("durationRow");
+  if (durationRow) {
+    durationRow.style.display = (action === "ON") ? "grid" : "none";
+  }
+}
+
 function toggleDay(idx) {
   const hEl = document.getElementById("schedHour");
   const mEl = document.getElementById("schedMin");
+  const dEl = document.getElementById("schedDuration");
   const h = hEl ? hEl.value : "0";
   const m = mEl ? mEl.value : "0";
+  const d = dEl ? dEl.value : "0";
   const i = selectedDays.indexOf(idx);
   if (i >= 0) selectedDays.splice(i, 1);
   else selectedDays.push(idx);
@@ -2147,8 +2637,10 @@ function toggleDay(idx) {
   setTimeout(() => {
     const hEl2 = document.getElementById("schedHour");
     const mEl2 = document.getElementById("schedMin");
+    const dEl2 = document.getElementById("schedDuration");
     if (hEl2) hEl2.value = h;
     if (mEl2) mEl2.value = m;
+    if (dEl2) dEl2.value = d;
   }, 0);
 }
 
@@ -2164,41 +2656,133 @@ function submitSchedule() {
   const action = document.getElementById("schedAction").value;
   const enabled = document.getElementById("schedEnabled").value === "1";
 
+  let duration = 0;
+  if (action === "ON") {
+    const durEl = document.getElementById("schedDuration");
+    duration = durEl ? parseInt(durEl.value) || 0 : 0;
+    if (duration < 0 || duration > 1440) {
+      showToast("مدت زمان باید بین 0 تا 1440 دقیقه باشد", "error");
+      return;
+    }
+  }
+
   if (isNaN(hour) || hour < 0 || hour > 23) { showToast("ساعت 0-23", "error"); return; }
   if (isNaN(minute) || minute < 0 || minute > 59) { showToast("دقیقه 0-59", "error"); return; }
-  if (!selectedDays.length) { showToast("حداقل یک روز", "error"); return; }
+  if (!selectedDays.length) { showToast("حداقل یک روز انتخاب کنید", "error"); return; }
 
   let daysMask = 0;
   selectedDays.forEach(d => daysMask |= (1 << d));
 
+  // حذف زمان‌بندی قبلی (در حالت ویرایش)
   if (editingScheduleId !== null) {
-    const idx = schedules.findIndex(s => s.id === editingScheduleId);
-    if (idx >= 0) schedules[idx] = { ...schedules[idx], hour, minute, relay, action, days: daysMask, enabled };
-  } else {
+    const existing = schedules.find(s => s.id === editingScheduleId);
+    if (existing && existing.groupId) {
+      schedules = schedules.filter(s => s.groupId !== existing.groupId);
+    } else {
+      schedules = schedules.filter(s => s.id !== editingScheduleId);
+    }
+  }
+
+  // حالت ۱: باز کردن با مدت زمان
+  if (action === "ON" && duration > 0) {
+    const groupId = "g" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+
+    let offTotalMin = hour * 60 + minute + duration;
+    const crossesDay = offTotalMin >= (24 * 60);
+    offTotalMin = offTotalMin % (24 * 60);
+    const offHour = Math.floor(offTotalMin / 60);
+    const offMin  = offTotalMin % 60;
+
+    const newId1 = schedules.length ? Math.max(...schedules.map(s => s.id)) + 1 : 1;
+    const newId2 = newId1 + 1;
+
+    schedules.push({
+      id: newId1,
+      hour: hour,
+      minute: minute,
+      relay: relay,
+      action: "ON",
+      days: daysMask,
+      enabled: enabled,
+      groupId: groupId,
+      duration: duration,
+      offHour: offHour,
+      offMin: offMin
+    });
+
+    schedules.push({
+      id: newId2,
+      hour: offHour,
+      minute: offMin,
+      relay: relay,
+      action: "OFF",
+      days: daysMask,
+      enabled: enabled,
+      groupId: groupId,
+      isAutoOff: true
+    });
+
+    if (crossesDay) {
+      showToast(`خاموشی خودکار در روز بعد ساعت ${String(offHour).padStart(2, "0")}:${String(offMin).padStart(2, "0")}`, "info");
+    } else {
+      showToast(`باز می‌شود ساعت ${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")} و بسته می‌شود ساعت ${String(offHour).padStart(2, "0")}:${String(offMin).padStart(2, "0")}`, "success");
+    }
+  }
+  // حالت ۲: بدون مدت یا خاموش کردن
+  else {
     const newId = schedules.length ? Math.max(...schedules.map(s => s.id)) + 1 : 1;
-    schedules.push({ id: newId, hour, minute, relay, action, days: daysMask, enabled });
+    schedules.push({
+      id: newId,
+      hour: hour,
+      minute: minute,
+      relay: relay,
+      action: action,
+      days: daysMask,
+      enabled: enabled
+    });
+    showToast("ذخیره شد", "success");
   }
 
   pushSchedulesToESP32();
   cancelScheduleForm();
   renderScheduleList();
   updateSchedulesStats();
-  showToast("ذخیره شد", "success");
   editingScheduleId = null;
 }
 
 function toggleSchedule(id, enabled) {
   const s = schedules.find(x => x.id === id);
   if (!s) return;
-  s.enabled = enabled;
+
+  if (s.groupId) {
+    schedules.forEach(x => {
+      if (x.groupId === s.groupId) x.enabled = enabled;
+    });
+  } else {
+    s.enabled = enabled;
+  }
+
   pushSchedulesToESP32();
   renderScheduleList();
   updateSchedulesStats();
 }
 
 function deleteSchedule(id) {
-  if (!confirm("حذف شود؟")) return;
-  schedules = schedules.filter(s => s.id !== id);
+  const s = schedules.find(x => x.id === id);
+  if (!s) return;
+
+  const msg = s.groupId
+    ? "این زمان‌بندی (و بسته شدن خودکار آن) حذف شود؟"
+    : "این زمان‌بندی حذف شود؟";
+
+  if (!confirm(msg)) return;
+
+  if (s.groupId) {
+    schedules = schedules.filter(x => x.groupId !== s.groupId);
+  } else {
+    schedules = schedules.filter(x => x.id !== id);
+  }
+
   pushSchedulesToESP32();
   renderScheduleList();
   updateSchedulesStats();
@@ -2206,12 +2790,25 @@ function deleteSchedule(id) {
 
 function pushSchedulesToESP32() {
   localStorage.setItem("relay_schedules", JSON.stringify(schedules));
+
   if (!mqttClient || !mqttClient.connected) return;
-  mqttClient.publish(CONFIG.TOPIC_SCHED_SET, JSON.stringify({ schedules }), { qos: 1 });
+
+  // فقط فیلدهای مجاز ESP32 را بفرست
+  const cleanSchedules = schedules.map(s => ({
+    id: s.id,
+    relay: s.relay,
+    hour: s.hour,
+    minute: s.minute,
+    action: s.action,
+    days: s.days,
+    enabled: s.enabled
+  }));
+
+  mqttClient.publish(CONFIG.TOPIC_SCHED_SET, JSON.stringify({ schedules: cleanSchedules }), { qos: 1 });
 }
 
 /* ============================================================
-   Modal
+   Tabs
    ============================================================ */
 function switchTab(evt, tabId) {
   document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
@@ -2227,7 +2824,9 @@ function renderNamesGrid() {
     const item = document.createElement("div");
     item.className = "name-item";
     item.innerHTML = `
-      <div class="name-item-icon">${relayIcons[i]}</div>
+      <div class="name-item-icon">
+        <svg><use href="#icon-valve-mini"/></svg>
+      </div>
       <span class="name-item-num">#${i + 1}</span>
       <input type="text" id="name-input-${i}" value="${relayNames[i]}" maxlength="20" placeholder="نام..." autocomplete="off" autocorrect="off" spellcheck="false">
     `;
@@ -2236,7 +2835,7 @@ function renderNamesGrid() {
 }
 
 /* ============================================================
-   قفل و بازکردن اسکرول
+   قفل اسکرول
    ============================================================ */
 function lockBodyScroll() {
   document.body.classList.add("modal-open");
@@ -2252,7 +2851,7 @@ function unlockBodyScroll() {
 }
 
 /* ============================================================
-   باز/بستن About
+   About
    ============================================================ */
 function openAbout() {
   lockBodyScroll();
@@ -2271,7 +2870,7 @@ function handleAboutOverlayClick(e) {
 }
 
 /* ============================================================
-   باز/بستن تنظیمات
+   Settings
    ============================================================ */
 function openSettings() {
   document.getElementById("inputBroker").value = CONFIG.BROKER_URL;
@@ -2306,7 +2905,7 @@ function saveSettings() {
   const newNames = [];
   for (let i = 0; i < CONFIG.NUM_RELAYS; i++) {
     const input = document.getElementById(`name-input-${i}`);
-    newNames.push((input && input.value ? input.value : "").trim() || `کانال ${i + 1}`);
+    newNames.push((input && input.value ? input.value : "").trim() || `شیربرقی ${i + 1}`);
   }
   updateAllNames(newNames);
 
@@ -2374,10 +2973,10 @@ function testSheetsConnection() {
   const testUrl = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/export?format=xlsx`;
   fetch(testUrl, { method: "HEAD" })
     .then(response => {
-      if (response.ok) showToast("✅ شیت قابل دسترسی است", "success");
-      else if (response.status === 401 || response.status === 403) showToast("❌ شیت خصوصی است", "error");
-      else if (response.status === 404) showToast("❌ Sheet ID اشتباه", "error");
-      else showToast(`⚠️ ${response.status}`, "info");
+      if (response.ok) showToast("شیت قابل دسترسی است", "success");
+      else if (response.status === 401 || response.status === 403) showToast("شیت خصوصی است", "error");
+      else if (response.status === 404) showToast("Sheet ID اشتباه", "error");
+      else showToast(`پاسخ سرور: ${response.status}`, "info");
     })
     .catch(() => showToast("خطای تست", "error"));
 }
